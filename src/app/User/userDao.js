@@ -1,92 +1,60 @@
-// 모든 유저 조회
-async function selectUser(connection) {
-  const selectUserListQuery = `
-                SELECT email, nickname 
-                FROM UserInfo;
-                `;
-  const [userRows] = await connection.query(selectUserListQuery);
-  return userRows;
-}
-
-// 이메일로 회원 조회
-async function selectUserEmail(connection, email) {
-  const selectUserEmailQuery = `
-                SELECT email, nickname 
-                FROM UserInfo 
-                WHERE email = ?;
-                `;
-  const [emailRows] = await connection.query(selectUserEmailQuery, email);
-  return emailRows;
-}
-
-// userId 회원 조회
-async function selectUserId(connection, userId) {
-  const selectUserIdQuery = `
-                 SELECT id, email, nickname 
-                 FROM UserInfo 
-                 WHERE id = ?;
-                 `;
-  const [userRow] = await connection.query(selectUserIdQuery, userId);
-  return userRow;
-}
-
-// 유저 생성
-async function insertUserInfo(connection, insertUserInfoParams) {
-  const insertUserInfoQuery = `
-        INSERT INTO UserInfo(email, password, nickname)
-        VALUES (?, ?, ?);
+// 휴대폰 번호 체크
+async function selectUserPhoneNum(connection, hashedPhoneNum) {
+  const query = `
+    select exists(select userPhoneNum from User where userPhoneNum = ?) as exist;
     `;
-  const insertUserInfoRow = await connection.query(
-    insertUserInfoQuery,
-    insertUserInfoParams
-  );
 
-  return insertUserInfoRow;
+  const [row] = await connection.query(query, hashedPhoneNum);
+  return row;
 }
 
-// 패스워드 체크
-async function selectUserPassword(connection, selectUserPasswordParams) {
-  const selectUserPasswordQuery = `
-        SELECT email, nickname, password
-        FROM UserInfo 
-        WHERE email = ? AND password = ?;`;
-  const selectUserPasswordRow = await connection.query(
-      selectUserPasswordQuery,
-      selectUserPasswordParams
-  );
+// 닉네임 체크
+async function selectUserNickname(connection, nickname) {
+  const query = `
+    select exists(select nickname from User where nickname = ?) as exist;
+    `;
 
-  return selectUserPasswordRow;
+  const [row] = await connection.query(query, nickname);
+  return row;
 }
 
-// 유저 계정 상태 체크 (jwt 생성 위해 id 값도 가져온다.)
-async function selectUserAccount(connection, email) {
-  const selectUserAccountQuery = `
-        SELECT status, id
-        FROM UserInfo 
-        WHERE email = ?;`;
-  const selectUserAccountRow = await connection.query(
-      selectUserAccountQuery,
-      email
-  );
-  return selectUserAccountRow[0];
+// 회원가입
+async function insertUserInfo(connection, params) {
+  const query = `
+        insert into User(userPhoneNum, nickname)
+        values (?, ?);
+    `;
+  const row = await connection.query(query, params);
+
+  return row;
 }
 
-async function updateUserInfo(connection, id, nickname) {
-  const updateUserQuery = `
-  UPDATE UserInfo 
-  SET nickname = ?
-  WHERE id = ?;`;
-  const updateUserRow = await connection.query(updateUserQuery, [nickname, id]);
-  return updateUserRow[0];
+// 유저 ID 조회
+async function selectUserInfo(connection, hashedPhoneNum) {
+  const query = `
+                select id
+                from User
+                where userPhoneNum = ?;
+                `;
+  const [row] = await connection.query(query, hashedPhoneNum);
+  return row;
 }
 
+// 유저 정보 수정
+async function updateUserByUserId(connection, params) {
+  const query = `
+                update User 
+                set photoURL = ?, nickname = ?
+                where id = ?;
+                `;
+  const row = await connection.query(query, params);
+  return row;
+}
 
 module.exports = {
-  selectUser,
-  selectUserEmail,
-  selectUserId,
+  selectUserPhoneNum,
+  selectUserNickname,
   insertUserInfo,
-  selectUserPassword,
-  selectUserAccount,
-  updateUserInfo,
+  selectUserInfo,
+  updateUserByUserId,
 };

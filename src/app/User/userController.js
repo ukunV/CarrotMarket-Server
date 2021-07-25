@@ -1,159 +1,149 @@
 const jwtMiddleware = require("../../../config/jwtMiddleware");
+const secret_config = require("../../../config/secret");
 const userProvider = require("../../app/User/userProvider");
 const userService = require("../../app/User/userService");
 const baseResponse = require("../../../config/baseResponseStatus");
-const {response, errResponse} = require("../../../config/response");
-
+const { response, errResponse } = require("../../../config/response");
+const crypto = require("crypto");
+const jwt = require("jsonwebtoken");
 const regexEmail = require("regex-email");
-const {emit} = require("nodemon");
+const { emit } = require("nodemon");
 
-/**
- * API No. 0
- * API Name : 테스트 API
- * [GET] /app/test
- */
- exports.getTest = async function (req, res) {
-     return res.send(response(baseResponse.SUCCESS))
- }
+// 랜덤 닉네임 생성 함수
+function createCode(numeric, alphabet) {
+  var randomStr = "";
+
+  for (var j = 0; j < 5; j++) {
+    randomStr += alphabet[Math.floor(Math.random() * alphabet.length)];
+  }
+
+  for (var j = 0; j < 5; j++) {
+    randomStr += numeric[Math.floor(Math.random() * numeric.length)];
+  }
+
+  return randomStr;
+}
+
+// Regex
+const regPhoneNum = /^\d{3}\d{3,4}\d{4}$/;
 
 /**
  * API No. 1
- * API Name : 유저 생성 (회원가입) API
- * [POST] /app/users
+ * API Name : 로그인 API (비회원일 경우 회원가입 후 로그인)
+ * [POST] /login
  */
-exports.postUsers = async function (req, res) {
+exports.createUser = async function (req, res) {
+  // Request Body
+  const { userPhoneNum, auth } = req.body;
 
-    /**
-     * Body: email, password, nickname
-     */
-    const {email, password, nickname} = req.body;
+  // Request Validation Check
+  if (!userPhoneNum)
+    return res.send(errResponse(baseResponse.SIGNUP_PHONENUM_EMPTY)); // 2001
 
-    // 빈 값 체크
-    if (!email)
-        return res.send(response(baseResponse.SIGNUP_EMAIL_EMPTY));
+  if (!regPhoneNum.test(userPhoneNum))
+    return res.send(errResponse(baseResponse.SIGNUP_PHONENUM_ERROR_TYPE)); // 2002
 
-    // 길이 체크
-    if (email.length > 30)
-        return res.send(response(baseResponse.SIGNUP_EMAIL_LENGTH));
+  if (!auth) return res.send(errResponse(baseResponse.SIGNUP_AUTH_EMPTY)); // 2003
 
-    // 형식 체크 (by 정규표현식)
-    if (!regexEmail.test(email))
-        return res.send(response(baseResponse.SIGNUP_EMAIL_ERROR_TYPE));
+  if (auth !== 1234)
+    // 인증번호 api 구현 전
+    return res.send(errResponse(baseResponse.SIGNUP_AUTH_NOT_MATCH)); // 2004
 
-    // 기타 등등 - 추가하기
+  // 휴대폰 번호 암호화
+  const hashedPhoneNum = await crypto
+    .createHash("sha512")
+    .update(userPhoneNum)
+    .digest("hex");
 
+  const checkPhoneNum = await userProvider.phoneNumCheck(hashedPhoneNum);
 
-    const signUpResponse = await userService.createUser(
-        email,
-        password,
-        nickname
+  // 이미 회원가입이 되어있는 회원일 경우 로그인
+  if (checkPhoneNum[0].exist === 1) {
+    const userIdx = await userProvider.getUserInfo(hashedPhoneNum);
+
+    //토큰 생성 Service
+    const token = await jwt.sign(
+      {
+        userId: userIdx[0].id,
+      }, // 토큰의 내용(payload)
+      secret_config.jwtsecret, // 비밀키
+      {
+        expiresIn: "365d",
+        subject: "userInfo",
+      } // 유효 기간 365일
     );
 
-    return res.send(signUpResponse);
+    return res.send(
+      response(baseResponse.SUCCESS, { userId: userIdx[0].id, jwt: token })
+    );
+  }
+
+  // nickname 겹치지 않을 때 까지
+  while (true) {
+    const numeric = `0,1,2,3,4,5,6,7,8,9`.split(",");
+    const alphabet = `a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,
+       A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z`.split(",");
+
+    const nickname = createCode(numeric, alphabet);
+    const checkUserNickname = await userProvider.nicknameCheck(nickname);
+
+    // 회원가입 후 바로 로그인
+    if (checkUserNickname[0].exist === 0) {
+      await userService.createUser(hashedPhoneNum, nickname);
+
+      const userIdx = await userProvider.getUserInfo(hashedPhoneNum);
+
+      const token = await jwt.sign(
+        {
+          userId: userIdResult[0].insertId,
+        }, // 토큰의 내용(payload)
+        secret_config.jwtsecret, // 비밀키
+        {
+          expiresIn: "365d",
+          subject: "userInfo",
+        } // 유효 기간 365일
+      );
+
+      return res.send(
+        response(baseResponse.SUCCESS, { userId: userIdx[0].id, jwt: token })
+      );
+    }
+  }
 };
 
 /**
  * API No. 2
- * API Name : 유저 조회 API (+ 이메일로 검색 조회)
- * [GET] /app/users
- */
-exports.getUsers = async function (req, res) {
-
-    /**
-     * Query String: email
-     */
-    const email = req.query.email;
-
-    if (!email) {
-        // 유저 전체 조회
-        const userListResult = await userProvider.retrieveUserList();
-        return res.send(response(baseResponse.SUCCESS, userListResult));
-    } else {
-        // 유저 검색 조회
-        const userListByEmail = await userProvider.retrieveUserList(email);
-        return res.send(response(baseResponse.SUCCESS, userListByEmail));
-    }
-};
-
-/**
- * API No. 3
- * API Name : 특정 유저 조회 API
- * [GET] /app/users/{userId}
- */
-exports.getUserById = async function (req, res) {
-
-    /**
-     * Path Variable: userId
-     */
-    const userId = req.params.userId;
-
-    if (!userId) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
-
-    const userByUserId = await userProvider.retrieveUser(userId);
-    return res.send(response(baseResponse.SUCCESS, userByUserId));
-};
-
-
-// TODO: After 로그인 인증 방법 (JWT)
-/**
- * API No. 4
- * API Name : 로그인 API
- * [POST] /app/login
- * body : email, passsword
- */
-exports.login = async function (req, res) {
-
-    const {email, password} = req.body;
-
-    // TODO: email, password 형식적 Validation
-
-    const signInResponse = await userService.postSignIn(email, password);
-
-    return res.send(signInResponse);
-};
-
-
-/**
- * API No. 5
  * API Name : 회원 정보 수정 API + JWT + Validation
- * [PATCH] /app/users/:userId
+ * [PATCH] /user/profile
  * path variable : userId
  * body : nickname
  */
-exports.patchUsers = async function (req, res) {
+exports.updateUser = async function (req, res) {
+  const { userId } = req.verifiedToken;
+  const { bodyId, photoURL, nickname } = req.body;
 
-    // jwt - userId, path variable :userId
+  // Request Validation
+  if (userId !== bodyId) res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2005
 
-    const userIdFromJWT = req.verifiedToken.userId
+  // Response Validation
+  const checkUserNickname = await userProvider.nicknameCheck(nickname);
+  if (checkUserNickname[0].exist === 1)
+    res.send(errResponse(baseResponse.MODIFY_REDUNDANT_NICKNAME)); // 3001
 
-    const userId = req.params.userId;
-    const nickname = req.body.nickname;
+  const result = await userService.updateUserByUserId(
+    photoURL,
+    nickname,
+    userId
+  );
 
-    if (userIdFromJWT != userId) {
-        res.send(errResponse(baseResponse.USER_ID_NOT_MATCH));
-    } else {
-        if (!nickname) return res.send(errResponse(baseResponse.USER_NICKNAME_EMPTY));
-
-        const editUserInfo = await userService.editUser(userId, nickname)
-        return res.send(editUserInfo);
-    }
+  return res.send(response(baseResponse.SUCCESS, result[0]["info"]));
 };
-
-
-
-
-
-
-
-
-
-
 
 /** JWT 토큰 검증 API
  * [GET] /app/auto-login
  */
-exports.check = async function (req, res) {
-    const userIdResult = req.verifiedToken.userId;
-    console.log(userIdResult);
-    return res.send(response(baseResponse.TOKEN_VERIFICATION_SUCCESS));
-};
+// exports.check = async function (req, res) {
+//   const userIdResult = req.verifiedToken.userId;
+//   console.log(userIdResult);
+//   return res.send(response(baseResponse.TOKEN_VERIFICATION_SUCCESS));
+// };
