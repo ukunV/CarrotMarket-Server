@@ -9,7 +9,7 @@ module.exports = function (app) {
   app.get("/user", jwtMiddleware, user.getMyCarrot);
 
   // 3. 회원 프로필 조회 API
-  app.get("/user/profile", jwtMiddleware, user.getUserProfile);
+  app.get("/user/:profileId/profile", jwtMiddleware, user.getUserProfile);
 
   // 4. 회원 프로필 수정 API
   app.patch("/user/profile", jwtMiddleware, user.updateUserProfile);

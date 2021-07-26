@@ -63,7 +63,7 @@ async function selectMyCarrot(connection, userId) {
 }
 
 // 회원 프로필 조회
-async function selectUserProfile(connection, userId) {
+async function selectUserProfile(connection, profileId) {
   const query1 = `
                   select u.nickname, u.photoURL, concat('#', u.id) as id, u.mannerTemperature, u.hopeRate, u.responseRate,
                         ifnull(ba.count, 0) as badgeCount, ifnull(m.count, 0) as merchandiseCount
@@ -120,9 +120,9 @@ async function selectUserProfile(connection, userId) {
                   limit 3;
                   `;
 
-  const result1 = await connection.query(query1, userId);
-  const result2 = await connection.query(query2, userId);
-  const result3 = await connection.query(query3, userId);
+  const result1 = await connection.query(query1, profileId);
+  const result2 = await connection.query(query2, profileId);
+  const result3 = await connection.query(query3, profileId);
   const row1 = JSON.parse(JSON.stringify(result1[0]));
   const row2 = JSON.parse(JSON.stringify(result2[0]));
   const row3 = JSON.parse(JSON.stringify(result3[0]));

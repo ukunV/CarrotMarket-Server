@@ -4,6 +4,7 @@ const userProvider = require("../../app/User/userProvider");
 const userService = require("../../app/User/userService");
 const baseResponse = require("../../../config/baseResponseStatus");
 const { response, errResponse } = require("../../../config/response");
+
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const regexEmail = require("regex-email");
@@ -132,16 +133,18 @@ exports.getMyCarrot = async function (req, res) {
 /**
  * API No. 3
  * API Name : 회원 프로필 조회 API
- * [GET] /user/profile
+ * [GET] /user/:profileId/profile
+ * Path Variable : userId
  */
 exports.getUserProfile = async function (req, res) {
   const { userId } = req.verifiedToken;
   const { bodyId } = req.body;
+  const { profileId } = req.params;
 
   // Request Validation
   if (userId !== bodyId) res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2005
 
-  const result = await userProvider.getUserProfile(userId);
+  const result = await userProvider.getUserProfile(profileId);
 
   return res.send(response(baseResponse.SUCCESS, result));
 };

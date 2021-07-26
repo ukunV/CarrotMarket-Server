@@ -1,4 +1,5 @@
 const { pool } = require("../../../config/database");
+const { errResponse } = require("../../../config/response");
 const { logger } = require("../../../config/winston");
 
 const userDao = require("./userDao");
@@ -48,10 +49,10 @@ exports.getUserId = async function (hashedPhoneNum) {
 };
 
 // 유저 프로필 조회
-exports.getUserProfile = async function (userId) {
+exports.getUserProfile = async function (profileId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
-    const result = await userDao.selectUserProfile(connection, userId);
+    const result = await userDao.selectUserProfile(connection, profileId);
     connection.release();
 
     return result;
