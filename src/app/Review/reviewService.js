@@ -13,18 +13,33 @@ const { connect } = require("http2");
 
 // Service: Create, Update, Delete 비즈니스 로직 처리
 
+// 후기 등록
 exports.createReview = async function (userId, authorId, contents) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
     const params = [userId, authorId, contents];
     const result = await reviewDao.insertReview(connection, params);
 
-    console.log(`상품 추가 : ${result}`);
     connection.release();
 
-    return response(baseResponse.SUCCESS);
-  } catch {
-    logger.error(`App - createReview Service error\n: ${err.message}`);
+    return result;
+  } catch (err) {
+    logger.error(`createReview Provider error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 후기 상태 변경
+exports.updateReviewStatus = async function (reviewId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const result = await reviewDao.updateReviewStatus(connection, reviewId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`updateReviewStatus Provider error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };

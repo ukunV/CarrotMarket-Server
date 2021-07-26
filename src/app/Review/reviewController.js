@@ -8,28 +8,54 @@ const regexEmail = require("regex-email");
 const { emit } = require("nodemon");
 
 /**
- * API No.
- * API Name : 후기 조회
- * [POST] /review
+ * API No. 5
+ * API Name : 후기 조회 API
+ * [GET] /review/:selectId
  */
-exports.getReviewByUserId = async function (req, res) {
-  const userId = req.body.userId;
+exports.getReview = async function (req, res) {
+  const { userId } = req.verifiedToken;
+  const { bodyId } = req.body;
+  const { selectId } = req.params;
 
-  const result = await reviewProvider.getReviewByUserId(userId);
+  // Request Validation
+  if (userId !== bodyId) res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2005
+
+  const result = await reviewProvider.getReview(selectId);
+
   return res.send(response(baseResponse.SUCCESS, result));
 };
 
 /**
- * API No.
- * API Name : 후기 등록
+ * API No. 6
+ * API Name : 후기 등록 API
  * [POST] /review
  */
-exports.getReviewByUserId = async function (req, res) {
-  const userId = req.params.userId;
-  const authorId = req.verifiedToken.userId;
-  const contents = req.body.contents;
+exports.createReview = async function (req, res) {
+  const { userId } = req.verifiedToken;
+  const { bodyId } = req.body;
+  const { authorId, contents } = req.body;
 
-  const params = [userId, authorId, contents];
-  const result = await reviewService.createReview(params);
+  // Request Validation
+  if (userId !== bodyId) res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2005
+
+  const result = await reviewService.createReview(userId, authorId, contents);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 7
+ * API Name : 후기 상태 변경 API
+ * [PATCH] /review
+ */
+exports.updateReviewStatus = async function (req, res) {
+  const { userId } = req.verifiedToken;
+  const { bodyId, reviewId } = req.body;
+
+  // Request Validation
+  if (userId !== bodyId) res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2005
+
+  const result = await reviewService.updateReviewStatus(reviewId);
+
   return res.send(response(baseResponse.SUCCESS, result));
 };
