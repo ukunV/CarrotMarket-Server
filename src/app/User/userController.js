@@ -59,7 +59,7 @@ exports.createUser = async function (req, res) {
 
   // 이미 회원가입이 되어있는 회원일 경우 로그인
   if (checkPhoneNum[0].exist === 1) {
-    const userIdx = await userProvider.getUserInfo(hashedPhoneNum);
+    const userIdx = await userProvider.getUserId(hashedPhoneNum);
 
     //토큰 생성 Service
     const token = await jwt.sign(
@@ -91,7 +91,7 @@ exports.createUser = async function (req, res) {
     if (checkUserNickname[0].exist === 0) {
       await userService.createUser(hashedPhoneNum, nickname);
 
-      const userIdx = await userProvider.getUserInfo(hashedPhoneNum);
+      const userIdx = await userProvider.getUserId(hashedPhoneNum);
 
       const token = await jwt.sign(
         {
@@ -113,12 +113,46 @@ exports.createUser = async function (req, res) {
 
 /**
  * API No. 2
- * API Name : 회원 정보 수정 API + JWT + Validation
+ * API Name : 나의 당근 조회 API
+ * [GET] /user
+ */
+
+exports.getMyCarrot = async function (req, res) {
+  const { userId } = req.verifiedToken;
+  const { bodyId } = req.body;
+
+  // Request Validation
+  if (userId !== bodyId) res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2005
+
+  const result = await userProvider.getMyCarrot(userId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 3
+ * API Name : 회원 프로필 조회 API
+ * [GET] /user/profile
+ */
+exports.getUserProfile = async function (req, res) {
+  const { userId } = req.verifiedToken;
+  const { bodyId } = req.body;
+
+  // Request Validation
+  if (userId !== bodyId) res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2005
+
+  const result = await userProvider.getUserProfile(userId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 4
+ * API Name : 회원 프로필 수정 API
  * [PATCH] /user/profile
- * path variable : userId
  * body : nickname
  */
-exports.updateUser = async function (req, res) {
+exports.updateUserProfile = async function (req, res) {
   const { userId } = req.verifiedToken;
   const { bodyId, photoURL, nickname } = req.body;
 
@@ -130,7 +164,7 @@ exports.updateUser = async function (req, res) {
   if (checkUserNickname[0].exist === 1)
     res.send(errResponse(baseResponse.MODIFY_REDUNDANT_NICKNAME)); // 3001
 
-  const result = await userService.updateUserByUserId(
+  const result = await userService.updateUserProfile(
     photoURL,
     nickname,
     userId

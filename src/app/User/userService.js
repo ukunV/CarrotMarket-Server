@@ -29,17 +29,17 @@ exports.createUser = async function (hashedPhoneNum, nickname) {
   }
 };
 
-exports.updateUserByUserId = async function (photoURL, nickname, userId) {
+exports.updateUserProfile = async function (photoURL, nickname, userId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
     const params = [photoURL, nickname, userId];
-    const result = await userDao.updateUserInfo(connection, params);
+    const result = await userDao.updateUserProfile(connection, params);
     connection.release();
 
     return result;
   } catch (err) {
-    logger.error(`updateUserByUserId Service error\n: ${err.message}`);
+    logger.error(`updateUserProfile Service error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };

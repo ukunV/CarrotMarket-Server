@@ -7,46 +7,70 @@ const userDao = require("./userDao");
 
 // 휴대폰 번호 체크
 exports.phoneNumCheck = async function (hashedPhoneNum) {
-  const connection = await pool.getConnection(async (conn) => conn);
-  const phoneNumCheckResult = await userDao.selectUserPhoneNum(
-    connection,
-    hashedPhoneNum
-  );
-  connection.release();
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const result = await userDao.selectUserPhoneNum(connection, hashedPhoneNum);
+    connection.release();
 
-  return phoneNumCheckResult;
+    return result;
+  } catch (err) {
+    logger.error(`phoneNumCheck Provider error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
 };
 
 // 닉네임 체크
 exports.nicknameCheck = async function (nickname) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
-    const nicknameCheckResult = await userDao.selectUserNickname(
-      connection,
-      nickname
-    );
+    const result = await userDao.selectUserNickname(connection, nickname);
     connection.release();
 
-    return nicknameCheckResult;
+    return result;
   } catch (err) {
     logger.error(`nicknameCheck Provider error\n: ${err.message}`);
-    return response(baseResponse.DB_ERROR);
+    return errResponse(baseResponse.DB_ERROR);
   }
 };
 
 // 유저 ID 조회
-exports.getUserInfo = async function (hashedPhoneNum) {
+exports.getUserId = async function (hashedPhoneNum) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
-    const userInfoResult = await userDao.selectUserInfo(
-      connection,
-      hashedPhoneNum
-    );
+    const result = await userDao.selectUserId(connection, hashedPhoneNum);
     connection.release();
 
-    return userInfoResult;
+    return result;
   } catch (err) {
-    logger.error(`userInfo Provider error\n: ${err.message}`);
-    return response(baseResponse.DB_ERROR);
+    logger.error(`getUserInfo Provider error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 유저 프로필 조회
+exports.getUserProfile = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const result = await userDao.selectUserProfile(connection, userId);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`getUserProfile Provider error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 나의 당근 조회
+exports.getMyCarrot = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const result = await userDao.selectMyCarrot(connection, userId);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`getMyCarrot Provider error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
   }
 };
