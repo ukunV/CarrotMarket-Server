@@ -12,13 +12,13 @@ const { emit } = require("nodemon");
 
 // 랜덤 닉네임 생성 함수
 function createCode(numeric, alphabet) {
-  var randomStr = "";
+  let randomStr = "";
 
-  for (var j = 0; j < 5; j++) {
+  for (let j = 0; j < 5; j++) {
     randomStr += alphabet[Math.floor(Math.random() * alphabet.length)];
   }
 
-  for (var j = 0; j < 5; j++) {
+  for (let j = 0; j < 5; j++) {
     randomStr += numeric[Math.floor(Math.random() * numeric.length)];
   }
 
@@ -133,18 +133,18 @@ exports.getMyCarrot = async function (req, res) {
 /**
  * API No. 3
  * API Name : 회원 프로필 조회 API
- * [GET] /user/:profileId/profile
+ * [GET] /user/:selectId/profile
  * Path Variable : userId
  */
 exports.getUserProfile = async function (req, res) {
   const { userId } = req.verifiedToken;
   const { bodyId } = req.body;
-  const { profileId } = req.params;
+  const { selectId } = req.params;
 
   // Request Validation
   if (userId !== bodyId) res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2005
 
-  const result = await userProvider.getUserProfile(profileId);
+  const result = await userProvider.getUserProfile(selectId);
 
   return res.send(response(baseResponse.SUCCESS, result));
 };

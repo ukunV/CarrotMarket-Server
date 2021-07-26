@@ -49,10 +49,10 @@ exports.getUserId = async function (hashedPhoneNum) {
 };
 
 // 유저 프로필 조회
-exports.getUserProfile = async function (profileId) {
+exports.getUserProfile = async function (selectId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
-    const result = await userDao.selectUserProfile(connection, profileId);
+    const result = await userDao.selectUserProfile(connection, selectId);
     connection.release();
 
     return result;
