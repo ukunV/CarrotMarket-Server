@@ -53,6 +53,18 @@ module.exports = {
     message: "이미 존재하는 닉네임입니다.",
   },
 
+  MERCHANDISE_IS_DELETED: {
+    isSuccess: false,
+    code: 3002,
+    message: "삭제된 상품입니다.",
+  },
+
+  MERCHANDISE_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3003,
+    message: "존재하지 않는 상품입니다.",
+  },
+
   //Connection, Transaction 등의 서버 오류
   DB_ERROR: { isSuccess: false, code: 4000, message: "데이터 베이스 에러" },
   SERVER_ERROR: { isSuccess: false, code: 4001, message: "서버 에러" },
