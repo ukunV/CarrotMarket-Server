@@ -24,7 +24,7 @@ exports.createReview = async function (userId, authorId, contents) {
 
     return result;
   } catch (err) {
-    logger.error(`createReview Provider error\n: ${err.message}`);
+    logger.error(`createReview Service error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
@@ -39,7 +39,7 @@ exports.updateReviewStatus = async function (reviewId) {
 
     return result;
   } catch (err) {
-    logger.error(`updateReviewStatus Provider error\n: ${err.message}`);
+    logger.error(`updateReviewStatus Service error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };

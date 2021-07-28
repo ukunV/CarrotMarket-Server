@@ -8,6 +8,6 @@ module.exports = function (app) {
   // 6. 후기 등록 API
   app.post("/review", jwtMiddleware, review.createReview);
 
-  // 6. 후기 등록 API
+  // 7. 후기 상태 변경 API
   app.patch("/review", jwtMiddleware, review.updateReviewStatus);
 };

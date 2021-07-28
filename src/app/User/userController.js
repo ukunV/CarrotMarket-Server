@@ -37,7 +37,7 @@ exports.createUser = async function (req, res) {
   // Request Body
   const { userPhoneNum, auth } = req.body;
 
-  // Request Validation Check
+  // Request Error Check
   if (!userPhoneNum)
     return res.send(errResponse(baseResponse.SIGNUP_PHONENUM_EMPTY)); // 2001
 
@@ -122,7 +122,7 @@ exports.getMyCarrot = async function (req, res) {
   const { userId } = req.verifiedToken;
   const { bodyId } = req.body;
 
-  // Request Validation
+  // Request Error
   if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
 
   if (userId !== bodyId)
@@ -144,7 +144,7 @@ exports.getUserProfile = async function (req, res) {
   const { bodyId } = req.body;
   const { selectId } = req.params;
 
-  // Request Validation
+  // Request Error
   if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
 
   if (userId !== bodyId)
@@ -153,12 +153,12 @@ exports.getUserProfile = async function (req, res) {
   const checkExist = await userProvider.checkExist(selectId);
 
   if (checkExist === 0)
-    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2009
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2007
 
   const checkStatus = await userProvider.checkStatus(selectId);
 
   if (checkStatus !== 1)
-    return res.send(errResponse(baseResponse.USER_STATUS_IS_NOT_VALID)); // 2010
+    return res.send(errResponse(baseResponse.USER_STATUS_IS_NOT_VALID)); // 2008
 
   const result = await userProvider.getUserProfile(selectId);
 
@@ -175,13 +175,13 @@ exports.updateUserProfile = async function (req, res) {
   const { userId } = req.verifiedToken;
   const { bodyId, photoURL, nickname } = req.body;
 
-  // Request Validation
+  // Request Error
   if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
 
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
 
-  // Response Validation
+  // Response Error
   const checkUserNickname = await userProvider.nicknameCheck(nickname);
 
   if (checkUserNickname[0].exist === 1)
