@@ -115,7 +115,7 @@ exports.createUser = async function (req, res) {
 /**
  * API No. 2
  * API Name : 나의 당근 조회 API
- * [GET] /user
+ * [GET] /user/my-carrot
  */
 
 exports.getMyCarrot = async function (req, res) {
