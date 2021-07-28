@@ -26,6 +26,7 @@ async function selectReview(connection, selectId) {
                 `;
 
   const row = await connection.query(query, selectId);
+
   return row[0];
 }
 
@@ -37,6 +38,7 @@ async function insertReview(connection, params) {
                 `;
 
   const row = await connection.query(query, params);
+
   return row[0];
 }
 
@@ -49,6 +51,7 @@ async function updateReviewStatus(connection, reviewId) {
                 `;
 
   const row = await connection.query(query, reviewId);
+
   return row[0]["info"];
 }
 

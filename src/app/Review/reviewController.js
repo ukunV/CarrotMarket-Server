@@ -18,7 +18,10 @@ exports.getReview = async function (req, res) {
   const { selectId } = req.params;
 
   // Request Validation
-  if (userId !== bodyId) res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2005
+  if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
+
+  if (userId !== bodyId)
+    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
 
   const result = await reviewProvider.getReview(selectId);
 
@@ -36,7 +39,10 @@ exports.createReview = async function (req, res) {
   const { authorId, contents } = req.body;
 
   // Request Validation
-  if (userId !== bodyId) res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2005
+  if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
+
+  if (userId !== bodyId)
+    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
 
   const result = await reviewService.createReview(userId, authorId, contents);
 
@@ -53,7 +59,10 @@ exports.updateReviewStatus = async function (req, res) {
   const { bodyId, reviewId } = req.body;
 
   // Request Validation
-  if (userId !== bodyId) res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2005
+  if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
+
+  if (userId !== bodyId)
+    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
 
   const result = await reviewService.updateReviewStatus(reviewId);
 

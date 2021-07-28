@@ -123,7 +123,10 @@ exports.getMyCarrot = async function (req, res) {
   const { bodyId } = req.body;
 
   // Request Validation
-  if (userId !== bodyId) res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2005
+  if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
+
+  if (userId !== bodyId)
+    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
 
   const result = await userProvider.getMyCarrot(userId);
 
@@ -142,7 +145,20 @@ exports.getUserProfile = async function (req, res) {
   const { selectId } = req.params;
 
   // Request Validation
-  if (userId !== bodyId) res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2005
+  if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
+
+  if (userId !== bodyId)
+    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkExist = await userProvider.checkExist(selectId);
+
+  if (checkExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2009
+
+  const checkStatus = await userProvider.checkStatus(selectId);
+
+  if (checkStatus !== 1)
+    return res.send(errResponse(baseResponse.USER_STATUS_IS_NOT_VALID)); // 2010
 
   const result = await userProvider.getUserProfile(selectId);
 
@@ -160,10 +176,14 @@ exports.updateUserProfile = async function (req, res) {
   const { bodyId, photoURL, nickname } = req.body;
 
   // Request Validation
-  if (userId !== bodyId) res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2005
+  if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
+
+  if (userId !== bodyId)
+    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
 
   // Response Validation
   const checkUserNickname = await userProvider.nicknameCheck(nickname);
+
   if (checkUserNickname[0].exist === 1)
     res.send(errResponse(baseResponse.MODIFY_REDUNDANT_NICKNAME)); // 3001
 

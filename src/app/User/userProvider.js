@@ -62,6 +62,36 @@ exports.getUserProfile = async function (selectId) {
   }
 };
 
+// 유저 존재 여부 check
+exports.checkExist = async function (selectId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const result = await userDao.checkExist(connection, selectId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`checkExist Provider error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 유저 상태 check
+exports.checkStatus = async function (selectId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const result = await userDao.checkStatus(connection, selectId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`checkStatus Provider error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
 // 나의 당근 조회
 exports.getMyCarrot = async function (userId) {
   try {

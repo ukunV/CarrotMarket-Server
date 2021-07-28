@@ -4,8 +4,9 @@ async function selectUserPhoneNum(connection, hashedPhoneNum) {
     select exists(select userPhoneNum from User where userPhoneNum = ?) as exist;
     `;
 
-  const [row] = await connection.query(query, hashedPhoneNum);
-  return row;
+  const row = await connection.query(query, hashedPhoneNum);
+
+  return row[0];
 }
 
 // 닉네임 체크
@@ -14,16 +15,18 @@ async function selectUserNickname(connection, nickname) {
     select exists(select nickname from User where nickname = ?) as exist;
     `;
 
-  const [row] = await connection.query(query, nickname);
-  return row;
+  const row = await connection.query(query, nickname);
+
+  return row[0];
 }
 
 // 회원가입
 async function insertUserInfo(connection, params) {
   const query = `
-        insert into User(userPhoneNum, nickname)
-        values (?, ?);
-    `;
+                insert into User(userPhoneNum, nickname)
+                values (?, ?);
+                `;
+
   const row = await connection.query(query, params);
 
   return row;
@@ -36,8 +39,10 @@ async function selectUserId(connection, hashedPhoneNum) {
                 from User
                 where userPhoneNum = ?;
                 `;
-  const [row] = await connection.query(query, hashedPhoneNum);
-  return row;
+
+  const row = await connection.query(query, hashedPhoneNum);
+
+  return row[0];
 }
 
 // 유저 정보 수정
@@ -47,7 +52,9 @@ async function updateUserProfile(connection, params) {
                 set photoURL = ?, nickname = ?
                 where id = ?;
                 `;
+
   const row = await connection.query(query, params);
+
   return row;
 }
 
@@ -58,7 +65,9 @@ async function selectMyCarrot(connection, userId) {
                 from User
                 where id = ?
                 `;
+
   const row = await connection.query(query, userId);
+
   return row[0];
 }
 
@@ -72,6 +81,7 @@ async function selectUserProfile(connection, selectId) {
                         left join (select userId, count(userId) as count from Merchandise group by userId) as m on u.id = m.userId
                   where u.id = ?;
                   `;
+
   const query2 = `
                   select m.title, count(ma.mannerId) as mannerCount
                   from Manner m
@@ -82,6 +92,7 @@ async function selectUserProfile(connection, selectId) {
                   order by ma.mannerId
                   limit 3;
                   `;
+
   const query3 = `
                   select u.photoURL as authorPhotoURL, u.nickname as authorNickname, r.contents,
                         case
@@ -123,12 +134,38 @@ async function selectUserProfile(connection, selectId) {
   const result1 = await connection.query(query1, selectId);
   const result2 = await connection.query(query2, selectId);
   const result3 = await connection.query(query3, selectId);
-  const row1 = JSON.parse(JSON.stringify(result1[0]));
-  const row2 = JSON.parse(JSON.stringify(result2[0]));
-  const row3 = JSON.parse(JSON.stringify(result3[0]));
-  const row = { row1, row2, row3 };
+
+  const information = JSON.parse(JSON.stringify(result1[0]));
+  const manner = JSON.parse(JSON.stringify(result2[0]));
+  const review = JSON.parse(JSON.stringify(result3[0]));
+
+  const row = { information, manner, review };
 
   return row;
+}
+
+// 유저 존재 여부 check
+async function checkExist(connection, selectId) {
+  const query = `
+        select exists(select id from User where id = ?) as exist;
+                `;
+
+  const row = await connection.query(query, selectId);
+
+  return row[0][0]["exist"];
+}
+
+// 유저 상태 check
+async function checkStatus(connection, selectId) {
+  const query = `
+                select status
+                from User
+                where id = ?
+                `;
+
+  const row = await connection.query(query, selectId);
+
+  return row[0][0]["status"];
 }
 
 module.exports = {
@@ -139,4 +176,6 @@ module.exports = {
   updateUserProfile,
   selectMyCarrot,
   selectUserProfile,
+  checkExist,
+  checkStatus,
 };
