@@ -13,110 +13,136 @@ const { connect } = require("http2");
 
 // Service: Create, Update, Delete 비즈니스 로직 처리
 
+// 판매상품 생성
 exports.createMerchandise = async function (
   categoryId,
   userId,
   title,
   contents,
-  price
+  price,
+  image_arr
 ) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
-    const params = [categoryId, userId, title, contents, price];
-    const result = await merchandiseDao.insertMerchandise(connection, params);
-    console.log(`상품 추가 : ${result}`);
-    connection.release();
-    return response(baseResponse.SUCCESS);
-  } catch {
-    logger.error(`App - createUser Service error\n: ${err.message}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-};
 
-// 이미지 배열 처리
-exports.createMerchandiseImage = async function (
-  merchandiseId,
-  number,
-  imageURL
-) {
-  try {
-    const connection = await pool.getConnection(async (conn) => conn);
-    const params = [merchandiseId, number, imageURL];
-    const result = await merchandiseDao.insertMerchandiseImage(
+    const result = await merchandiseDao.insertMerchandise(
       connection,
-      params
+      categoryId,
+      userId,
+      title,
+      contents,
+      price,
+      image_arr
     );
-    console.log(`상품 이미지 추가 : ${result}`);
+
     connection.release();
-    return response(baseResponse.SUCCESS);
-  } catch {
-    logger.error(`App - createUser Service error\n: ${err.message}`);
+
+    return result;
+  } catch (err) {
+    logger.error(`createMerchandise Service error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
 
-exports.updateMerchandise = async function (
-  categoryId,
-  userId,
-  title,
-  contents,
-  price
-) {
-  try {
-    const connection = await pool.getConnection(async (conn) => conn);
-    const params = [categoryId, userId, title, contents, price];
-    const result = await merchandiseDao.updateMerchandise(connection, params);
-    console.log(`상품 수정 : ${result}`);
-    connection.release();
-    return response(baseResponse.SUCCESS);
-  } catch {
-    logger.error(`App - createUser Service error\n: ${err.message}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-};
-
-exports.updateMerchandiseImage = async function (merchandiseId) {
-  try {
-    const connection = await pool.getConnection(async (conn) => conn);
-    const result = await merchandiseDao.updateMerchandise(
-      connection,
-      merchandiseId
-    );
-    console.log(`상품 수정 : ${result}`);
-    connection.release();
-    return response(baseResponse.SUCCESS);
-  } catch {
-    logger.error(`App - createUser Service error\n: ${err.message}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-};
-
-exports.updateMerchandiseStatus = async function (status, id) {
-  try {
-    const connection = await pool.getConnection(async (conn) => conn);
-    const params = [status, id];
-    const result = await merchandiseDao.updateMerchandise(connection, params);
-    console.log(`상품 상태 수정 : ${result}`);
-    connection.release();
-    return response(baseResponse.SUCCESS);
-  } catch {
-    logger.error(`App - createUser Service error\n: ${err.message}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-};
-
+// 판매상품 삭제
 exports.deleteMerchandise = async function (merchandiseId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
-    const result = await merchandiseDao.updateMerchandise(
+    const result = await merchandiseDao.deleteMerchandise(
       connection,
       merchandiseId
     );
-    console.log(`상품 삭제 : ${result}`);
+
     connection.release();
-    return response(baseResponse.SUCCESS);
+
+    return result;
   } catch {
-    logger.error(`App - createUser Service error\n: ${err.message}`);
+    logger.error(`deleteMerchandise Service error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 판매상품 끌어올리기
+exports.pullUpMerchandise = async function (merchandiseId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const result = await merchandiseDao.pullUpMerchandise(
+      connection,
+      price,
+      merchandiseId
+    );
+
+    connection.release();
+
+    return result;
+  } catch {
+    logger.error(`pullUpMerchandise Service error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// exports.updateMerchandise = async function (
+//   categoryId,
+//   userId,
+//   title,
+//   contents,
+//   price
+// ) {
+//   try {
+//     const connection = await pool.getConnection(async (conn) => conn);
+//     const params = [categoryId, userId, title, contents, price];
+//     const result = await merchandiseDao.updateMerchandise(connection, params);
+
+//     connection.release();
+//     return response(baseResponse.SUCCESS);
+//   } catch {
+//     logger.error(`updateMerchandise Service error\n: ${err.message}`);
+//     return errResponse(baseResponse.DB_ERROR);
+//   }
+// };
+
+// exports.updateMerchandiseImage = async function (merchandiseId) {
+//   try {
+//     const connection = await pool.getConnection(async (conn) => conn);
+//     const result = await merchandiseDao.updateMerchandise(
+//       connection,
+//       merchandiseId
+//     );
+//     console.log(`상품 수정 : ${result}`);
+//     connection.release();
+//     return response(baseResponse.SUCCESS);
+//   } catch {
+//     logger.error(`App - createUser Service error\n: ${err.message}`);
+//     return errResponse(baseResponse.DB_ERROR);
+//   }
+// };
+
+// exports.updateMerchandiseStatus = async function (status, id) {
+//   try {
+//     const connection = await pool.getConnection(async (conn) => conn);
+//     const params = [status, id];
+//     const result = await merchandiseDao.updateMerchandise(connection, params);
+//     console.log(`상품 상태 수정 : ${result}`);
+//     connection.release();
+//     return response(baseResponse.SUCCESS);
+//   } catch {
+//     logger.error(`App - createUser Service error\n: ${err.message}`);
+//     return errResponse(baseResponse.DB_ERROR);
+//   }
+// };
+
+// exports.deleteMerchandise = async function (merchandiseId) {
+//   try {
+//     const connection = await pool.getConnection(async (conn) => conn);
+//     const result = await merchandiseDao.updateMerchandise(
+//       connection,
+//       merchandiseId
+//     );
+//     console.log(`상품 삭제 : ${result}`);
+//     connection.release();
+//     return response(baseResponse.SUCCESS);
+//   } catch {
+//     logger.error(`App - createUser Service error\n: ${err.message}`);
+//     return errResponse(baseResponse.DB_ERROR);
+//   }
+// };
