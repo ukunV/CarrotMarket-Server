@@ -90,6 +90,11 @@ module.exports = {
     code: 2014,
     message: "끌어올리기를 한지 3일이 지나지 않았습니다.",
   },
+  USERID_IS_NOT_HOST: {
+    isSuccess: false,
+    code: 2015,
+    message: "해당 상품에 접근할 수 없습니다.",
+  },
 
   // Response error
   MODIFY_REDUNDANT_NICKNAME: {
