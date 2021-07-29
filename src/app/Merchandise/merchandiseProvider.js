@@ -75,6 +75,26 @@ exports.checkMerchandiseExist = async function (merchandiseId) {
   }
 };
 
+// 상품 주인 여부 check
+exports.checkHost = async function (userId, merchandiseId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await merchandiseDao.checkHost(
+      connection,
+      userId,
+      merchandiseId
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`checkHost Provider error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
 // 상품 삭제 여부 check
 exports.checkMerchandiseIsDeleted = async function (merchandiseId) {
   try {
@@ -162,18 +182,22 @@ exports.checkPullUpPossible = async function (merchandiseId) {
   }
 };
 
-// exports.getMyMerchandiseById = async function (userId) {
-//   try {
-//     const connection = await pool.getConnection(async (conn) => conn);
-//     const result = await merchandiseDao.selectMyMerchandiseById(
-//       connection,
-//       userId
-//     );
-//     connection.release();
+// 내 판매상품 조회 API (status - 판매중/예약중 : 1, 거래완료 : 0)
+exports.getMyMerchandise = async function (userId, condition) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
 
-//     return result;
-//   } catch (err) {
-//     logger.error(`getMyMerchandiseById Provider error\n: ${err.message}`);
-//     return errResponse(baseResponse.DB_ERROR);
-//   }
-// };
+    const result = await merchandiseDao.selectMyMerchandise(
+      connection,
+      userId,
+      condition
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`getMyMerchandise Provider error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

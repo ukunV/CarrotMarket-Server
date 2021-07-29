@@ -56,14 +56,14 @@ exports.deleteMerchandise = async function (merchandiseId) {
     connection.release();
 
     return result;
-  } catch {
+  } catch (err) {
     logger.error(`deleteMerchandise Service error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
 
 // 판매상품 끌어올리기
-exports.pullUpMerchandise = async function (merchandiseId) {
+exports.pullUpMerchandise = async function (price, merchandiseId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
     const result = await merchandiseDao.pullUpMerchandise(
@@ -75,74 +75,59 @@ exports.pullUpMerchandise = async function (merchandiseId) {
     connection.release();
 
     return result;
-  } catch {
+  } catch (err) {
     logger.error(`pullUpMerchandise Service error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
 
-// exports.updateMerchandise = async function (
-//   categoryId,
-//   userId,
-//   title,
-//   contents,
-//   price
-// ) {
-//   try {
-//     const connection = await pool.getConnection(async (conn) => conn);
-//     const params = [categoryId, userId, title, contents, price];
-//     const result = await merchandiseDao.updateMerchandise(connection, params);
+// 판매상품 상태 변경
+exports.updateMerchandiseStatus = async function (status, merchandiseId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
 
-//     connection.release();
-//     return response(baseResponse.SUCCESS);
-//   } catch {
-//     logger.error(`updateMerchandise Service error\n: ${err.message}`);
-//     return errResponse(baseResponse.DB_ERROR);
-//   }
-// };
+    const params = [status, merchandiseId];
+    const result = await merchandiseDao.updateMerchandiseStatus(
+      connection,
+      params
+    );
 
-// exports.updateMerchandiseImage = async function (merchandiseId) {
-//   try {
-//     const connection = await pool.getConnection(async (conn) => conn);
-//     const result = await merchandiseDao.updateMerchandise(
-//       connection,
-//       merchandiseId
-//     );
-//     console.log(`상품 수정 : ${result}`);
-//     connection.release();
-//     return response(baseResponse.SUCCESS);
-//   } catch {
-//     logger.error(`App - createUser Service error\n: ${err.message}`);
-//     return errResponse(baseResponse.DB_ERROR);
-//   }
-// };
+    connection.release();
 
-// exports.updateMerchandiseStatus = async function (status, id) {
-//   try {
-//     const connection = await pool.getConnection(async (conn) => conn);
-//     const params = [status, id];
-//     const result = await merchandiseDao.updateMerchandise(connection, params);
-//     console.log(`상품 상태 수정 : ${result}`);
-//     connection.release();
-//     return response(baseResponse.SUCCESS);
-//   } catch {
-//     logger.error(`App - createUser Service error\n: ${err.message}`);
-//     return errResponse(baseResponse.DB_ERROR);
-//   }
-// };
+    return result;
+  } catch (err) {
+    logger.error(`updateMerchandiseStatus Service error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
 
-// exports.deleteMerchandise = async function (merchandiseId) {
-//   try {
-//     const connection = await pool.getConnection(async (conn) => conn);
-//     const result = await merchandiseDao.updateMerchandise(
-//       connection,
-//       merchandiseId
-//     );
-//     console.log(`상품 삭제 : ${result}`);
-//     connection.release();
-//     return response(baseResponse.SUCCESS);
-//   } catch {
-//     logger.error(`App - createUser Service error\n: ${err.message}`);
-//     return errResponse(baseResponse.DB_ERROR);
-//   }
-// };
+// 상품 수정
+exports.updateMerchandise = async function (
+  merchandiseId,
+  categoryId,
+  title,
+  contents,
+  price,
+  image_arr
+) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await merchandiseDao.updateMerchandise(
+      connection,
+      merchandiseId,
+      categoryId,
+      title,
+      contents,
+      price,
+      image_arr
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`updateMerchandise Service error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

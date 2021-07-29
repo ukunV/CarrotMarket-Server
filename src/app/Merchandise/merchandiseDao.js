@@ -136,6 +136,19 @@ async function checkMerchandiseExist(connection, merchandiseId) {
   return row[0][0]["exist"];
 }
 
+// 상품 주인 여부 check
+async function checkHost(connection, userId, merchandiseId) {
+  const query = `
+                select if(userId = ?, 'true', 'false') as host
+                from Merchandise
+                where id = ?;
+                `;
+
+  const row = await connection.query(query, [userId, merchandiseId]);
+
+  return row[0][0]["host"];
+}
+
 // 상품 삭제 여부 check
 async function checkMerchandiseIsDeleted(connection, merchandiseId) {
   const query = `
@@ -225,67 +238,6 @@ async function selectCategoryMerchandise(connection, params) {
 
   return row[0];
 }
-
-// // 내 판매상품 read by userId
-// async function selectMyMerchandiseById(connection, userId) {
-//   const query = `
-//                   select mi.imageURL,
-//                          m.title,
-//                          m.price,
-//                          l.address3 as address,
-//                          ifnull(lc.likeCount, 0) as likeCount,
-//                          m.status,
-//                          m.pulledUpCount,
-//                          count(cr.merchandiseId) as chatroomCount,
-//                          case
-//                              when timestampdiff(year, m.pulledUpAt, now()) > 0 and m.pulledUpCount > 0
-//                                  then concat('끌올 ', timestampdiff(year, m.pulledUpAt, now()), '년 전')
-//                              when timestampdiff(year, m.createdAt, now()) > 0
-//                                  then concat(timestampdiff(year, m.createdAt, now()), '년 전')
-//                              when timestampdiff(month, m.pulledUpAt, now()) > 0 and m.pulledUpCount > 0
-//                                  then concat('끌올 ', timestampdiff(month, m.pulledUpAt, now()), '달 전')
-//                              when timestampdiff(month, m.createdAt, now()) > 0
-//                                  then concat(timestampdiff(month, m.createdAt, now()), '달 전')
-//                              when timestampdiff(day, m.pulledUpAt, now()) > 0 and m.pulledUpCount > 0
-//                                  then concat('끌올 ', timestampdiff(day, m.pulledUpAt, now()), '일 전')
-//                              when timestampdiff(day, m.createdAt, now()) > 0
-//                                  then concat(timestampdiff(day, m.createdAt, now()), '일 전')
-//                              when hour(timediff(m.pulledUpAt, now())) > 0 and m.pulledUpCount > 0
-//                                  then concat('끌올 ', hour(timediff(m.pulledUpAt, now())), '시간 전')
-//                              when hour(timediff(m.createdAt, now())) > 0
-//                                  then concat(hour(timediff(m.createdAt, now())), '년 전')
-//                              when minute(timediff(m.pulledUpAt, now())) > 0 and m.pulledUpCount > 0
-//                                  then concat('끌올 ', minute(timediff(m.pulledUpAt, now())), '분 전')
-//                              when minute(timediff(m.createdAt, now())) > 0
-//                                  then concat(minute(timediff(m.createdAt, now())), '년 전')
-//                              when second(timediff(m.pulledUpAt, now())) > 0 and m.pulledUpCount > 0
-//                                  then concat('끌올 ', second(timediff(m.pulledUpAt, now())), '초 전')
-//                              when second(timediff(m.createdAt, now())) > 0
-//                                  then concat(second(timediff(m.createdAt, now())), '년 전')
-//                         end as createdAt
-//                   from User u
-//                         left join Merchandise m on m.userId = u.id
-//                         left join (select id, merchandiseId, number, imageURL,
-//                                           ROW_NUMBER() over (PARTITION BY merchandiseId order by number) as rn
-//                                    from MerchandiseImage
-//                                    where isDeleted = 1) as mi on mi.merchandiseId = m.id
-//                         left join Location l on u.locationId = l.id
-//                         left join ChatRoom cr on cr.merchandiseId = m.id
-//                         left join (select ml.id, count(ml.id) as likeCount
-//                                    from MerchandiseLike ml
-//                                    where ml.isDeleted = 1
-//                                    group by ml.merchandiseId) as lc on m.id = lc.id
-//                   where m.status in (1, 2)
-//                   and m.isDeleted = 1
-//                   and m.userId = ?
-//                   and (mi.rn = 1 or mi.rn is null)
-//                   group by m.id
-//                   order by coalesce(m.pulledUpAt, m.createdAt) desc;
-//                   `;
-
-//   const [row] = await connection.query(query, userId);
-//   return row;
-// }
 
 // 상품 create
 async function insertMerchandise(
@@ -408,52 +360,135 @@ async function pullUpMerchandise(connection, price, merchandiseId) {
   return row[0].info;
 }
 
-// // 상품 수정 update
-// async function updateMerchandise(connection, params) {
-//   const query = `
-//                 update Merchandise
-//                 set categoryId = ?, userId = ?, title = ?, contents = ?, price = ?
-//                 where id = ?
-//                 `;
+// 상품 상태 update (0:거래완료 1:판매중 2: 예약중 3: 거래중지)
+async function updateMerchandiseStatus(connection, params) {
+  const query = `
+                update Merchandise
+                set status = ?
+                where id = ?
+                `;
 
-//   const row = await connection.query(query, params);
-//   return row;
-// }
+  const row = await connection.query(query, params);
 
-// // 상품 update 후 상품 사진 삭제 update
-// async function updateMerchandiseImage(connection, merchandiseId) {
-//   const query = `
-//                 update MerchandiseImage
-//                 set isDeleted = 0
-//                 where id = ?
-//                 `;
-//   const row = await connection.query(query, merchandiseId);
-//   return row;
-// }
+  return row[0].info;
+}
 
-// // 상품 상태 update (0:거래완료 1:판매중 2: 예약중 3: 거래중지)
-// async function updateMerchandiseStatus(connection, params) {
-//   const query = `
-//                 update Merchandise
-//                 set status = ?
-//                 where id = ?
-//                 `;
+// 내 판매상품 조회 (status - 판매중/예약중 : 1, 거래완료 : 0)
+async function selectMyMerchandise(connection, userId, condition) {
+  const query =
+    `
+                select mi.imageURL, m.title, m.price, l.address3 as address,
+                        ifnull(lc.likeCount, 0) as likeCount, m.status, m.pulledUpCount,
+                        count(cr.merchandiseId) as chatroomCount,
+                        case
+                            when timestampdiff(year, m.pulledUpAt, now()) > 0 and m.pulledUpCount > 0
+                                then concat('끌올 ', timestampdiff(year, m.pulledUpAt, now()), '년 전')
+                            when timestampdiff(year, m.createdAt, now()) > 0
+                                then concat(timestampdiff(year, m.createdAt, now()), '년 전')
+                            when timestampdiff(month, m.pulledUpAt, now()) > 0 and m.pulledUpCount > 0
+                                then concat('끌올 ', timestampdiff(month, m.pulledUpAt, now()), '달 전')
+                            when timestampdiff(month, m.createdAt, now()) > 0
+                                then concat(timestampdiff(month, m.createdAt, now()), '달 전')
+                            when timestampdiff(day, m.pulledUpAt, now()) > 0 and m.pulledUpCount > 0
+                                then concat('끌올 ', timestampdiff(day, m.pulledUpAt, now()), '일 전')
+                            when timestampdiff(day, m.createdAt, now()) > 0
+                                then concat(timestampdiff(day, m.createdAt, now()), '일 전')
+                            when hour(timediff(m.pulledUpAt, now())) > 0 and m.pulledUpCount > 0
+                                then concat('끌올 ', hour(timediff(m.pulledUpAt, now())), '시간 전')
+                            when hour(timediff(m.createdAt, now())) > 0
+                                then concat(hour(timediff(m.createdAt, now())), '년 전')
+                            when minute(timediff(m.pulledUpAt, now())) > 0 and m.pulledUpCount > 0
+                                then concat('끌올 ', minute(timediff(m.pulledUpAt, now())), '분 전')
+                            when minute(timediff(m.createdAt, now())) > 0
+                                then concat(minute(timediff(m.createdAt, now())), '년 전')
+                            when second(timediff(m.pulledUpAt, now())) > 0 and m.pulledUpCount > 0
+                                then concat('끌올 ', second(timediff(m.pulledUpAt, now())), '초 전')
+                            when second(timediff(m.createdAt, now())) > 0
+                                then concat(second(timediff(m.createdAt, now())), '년 전')
+                        end as createdAt
+                from User u
+                left join Merchandise m on m.userId = u.id
+                left join MerchandiseImage mi on m.id = mi.merchandiseId
+                left join Location l on u.locationId = l.id
+                left join ChatRoom cr on cr.merchandiseId = m.id
+                left join (select ml.id, count(ml.id) as likeCount
+                        from MerchandiseLike ml
+                        where ml.isDeleted = 1
+                        group by ml.merchandiseId) as lc on m.id = lc.id
+                where (mi.number = 1 or mi.number is null)
+                and m.isDeleted = 1
+                and m.userId = ?
+                ` +
+    condition +
+    `
+                group by m.id
+                order by coalesce(m.pulledUpAt, m.createdAt) desc;
+                `;
 
-//   const row = await connection.query(query, params);
-//   return row;
-// }
+  const row = await connection.query(query, [userId, condition]);
 
-// // 상품 delete
-// async function deleteMerchandise(connection, merchandiseId) {
-//   const query = `
-//                 update Merchandise
-//                 set isDeleted = 0
-//                 where id = ?
-//                 `;
+  return row[0];
+}
 
-//   const row = await connection.query(query, merchandiseId);
-//   return row;
-// }
+// 상품 수정 update
+async function updateMerchandise(
+  connection,
+  merchandiseId,
+  categoryId,
+  title,
+  contents,
+  price,
+  image_arr
+) {
+  const query1 = `
+                update Merchandise
+                set categoryId = ?, title = ?, contents = ?, price = ?
+                where id = ?;
+                `;
+
+  const row = await connection.query(query1, [
+    categoryId,
+    title,
+    contents,
+    price,
+    merchandiseId,
+  ]);
+
+  let result = JSON.parse(JSON.stringify(row[0])).info;
+
+  const query2 = `
+                update MerchandiseImage
+                set isDeleted = 0
+                where merchandiseId = ?;
+                `;
+
+  await connection.query(query2, merchandiseId);
+
+  result += ` arrayCount: ${image_arr.length}`;
+
+  let insertCount = 0;
+
+  for (let i = 0; i < image_arr.length; i++) {
+    const imgQuery = `
+                insert into MerchandiseImage(merchandiseId, number, imageURL)
+                values (?, ?, ?);
+                `;
+
+    const imgRow = await connection.query(imgQuery, [
+      merchandiseId,
+      image_arr[i][0],
+      image_arr[i][1],
+    ]);
+
+    if (imgRow[0].affectedRows === 1) {
+      insertCount += 1;
+    }
+  }
+
+  result += ` insertCount: ${insertCount}`;
+
+  return result;
+}
 
 module.exports = {
   checkLocationExist,
@@ -468,4 +503,8 @@ module.exports = {
   deleteMerchandise,
   checkPullUpPossible,
   pullUpMerchandise,
+  updateMerchandiseStatus,
+  checkHost,
+  selectMyMerchandise,
+  updateMerchandise,
 };

@@ -171,7 +171,7 @@ exports.createMerchandise = async function (req, res) {
 /**
  * API No. 13
  * API Name : 판매상품 삭제 API
- * [PATCH] /merchandise/:merchandiseId/status
+ * [PATCH] /merchandise/:merchandiseId
  */
 exports.deleteMerchandise = async function (req, res) {
   const { userId } = req.verifiedToken;
@@ -180,6 +180,11 @@ exports.deleteMerchandise = async function (req, res) {
   const { merchandiseId } = req.params;
 
   // Request Error
+  const checkHost = await merchandiseProvider.checkHost(userId, merchandiseId);
+
+  if (checkHost === "false")
+    return res.send(errResponse(baseResponse.USERID_IS_NOT_HOST)); // 2015
+
   if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
 
   if (userId !== bodyId)
@@ -217,6 +222,11 @@ exports.pullUpMerchandise = async function (req, res) {
   const { price } = req.body;
 
   // Request Error
+  const checkHost = await merchandiseProvider.checkHost(userId, merchandiseId);
+
+  if (checkHost === "false")
+    return res.send(errResponse(baseResponse.USERID_IS_NOT_HOST)); // 2015
+
   if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
 
   if (userId !== bodyId)
@@ -256,89 +266,123 @@ exports.pullUpMerchandise = async function (req, res) {
 };
 
 /**
- * API No. 13
- * API Name : 상품 수정
- * [PATCH] /merchandise/:merchandiseId/detail
- */
-// exports.updateMerchandise = async function (req, res) {
-//   const { userId } = req.verifiedToken;
-//   const { bodyId } = req.body;
-//   const { merchandiseId } = req.params;
-
-//   const { image_arr, categoryId, title, contents, price } = req.body;
-
-//   // Request Error
-//   if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
-
-//   if (userId !== bodyId)
-//     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
-
-//   const checkCategoryExist = await merchandiseProvider.checkCategoryExist(
-//     categoryId
-//   );
-
-//   if (checkCategoryExist === 0)
-//     return res.send(errResponse(baseResponse.CATEGORY_IS_NOT_EXIST)); // 2012
-
-//   const result = await merchandiseService.updateMerchandise(
-//     categoryId,
-//     userId,
-//     title,
-//     contents,
-//     price,
-//     image_arr
-//   );
-
-//   return res.send(response(baseResponse.SUCCESS, result));
-// };
-
-/**
- * API No. 14
- * API Name : 상품 사진 삭제 API
- * [PATCH] /merchandise/:merchandiseId/image
- */
-// exports.updateMerchandise = async function (req, res) {
-//   const { userId } = req.verifiedToken;
-//   const { bodyId } = req.body;
-//   const { merchandiseId } = req.params;
-//   const { imageId } = req.body;
-
-//   // Request Error
-//   if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
-
-//   if (userId !== bodyId)
-//     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
-
-//   const checkMerchandiseExist = await merchandiseProvider.checkMerchandiseExist(
-//     merchandiseId
-//   );
-
-//   if (checkMerchandiseExist === 0)
-//     return res.send(errResponse(baseResponse.MERCHANDISE_IS_NOT_EXIST)); // 2010
-
-//   const checkMerchandiseIsDeleted =
-//     await merchandiseProvider.checkMerchandiseIsDeleted(merchandiseId);
-
-//   if (checkMerchandiseIsDeleted === 0)
-//     return res.send(errResponse(baseResponse.MERCHANDISE_IS_DELETED)); // 2011
-
-//   // 이미지 id로 존재하는 이미지 인지 validation
-
-//   const result = await merchandiseService.updateMerchandise(imageId);
-
-//   return res.send(response(baseResponse.SUCCESS, result));
-// };
-
-/**
- * API No.
- * API Name : 상품 상태 수정
+ * API No. 15
+ * API Name : 판매상품 상태 변경 API
  * [PATCH] /merchandise/:merchandiseId/status
  */
-// exports.updateMerchandiseStatus = async function (req, res) {
-//   const { status, id } = req.body;
+exports.updateMerchandiseStatus = async function (req, res) {
+  const { userId } = req.verifiedToken;
+  const { bodyId } = req.body;
 
-//   const params = [status, id];
-//   const result = await merchandiseService.updateMerchandiseStatus(params);
+  const { merchandiseId } = req.params;
 
-//   return res.send(response(baseResponse.SUCCESS, result));
-// };
+  const { status } = req.body;
+
+  // Request Error
+  const checkHost = await merchandiseProvider.checkHost(userId, merchandiseId);
+
+  if (checkHost === "false")
+    return res.send(errResponse(baseResponse.USERID_IS_NOT_HOST)); // 2015
+
+  if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
+
+  if (userId !== bodyId)
+    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkMerchandiseExist = await merchandiseProvider.checkMerchandiseExist(
+    merchandiseId
+  );
+
+  if (checkMerchandiseExist === 0)
+    return res.send(errResponse(baseResponse.MERCHANDISE_IS_NOT_EXIST)); // 2010
+
+  const checkMerchandiseIsDeleted =
+    await merchandiseProvider.checkMerchandiseIsDeleted(merchandiseId);
+
+  if (checkMerchandiseIsDeleted === 0)
+    return res.send(errResponse(baseResponse.MERCHANDISE_IS_DELETED)); // 2011
+
+  const result = await merchandiseService.updateMerchandiseStatus(
+    status,
+    merchandiseId
+  );
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 16
+ * API Name : 내 판매상품 조회 API
+ * (status - 판매중/예약중 : 1, 거래완료 : 0)
+ * [GET] /merchandise/my-merchandise
+ * query string: status
+ */
+exports.getMyMerchandise = async function (req, res) {
+  const { userId } = req.verifiedToken;
+  const { bodyId } = req.body;
+
+  const { status } = req.query;
+
+  // Request Error
+  if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
+
+  if (userId !== bodyId)
+    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  let condition = "";
+
+  switch (status) {
+    case "0":
+      condition += "and m.status = 0";
+      break;
+    case "1":
+      condition += "and m.status in (1, 2)";
+      break;
+  }
+  console.log(condition);
+  const result = await merchandiseProvider.getMyMerchandise(userId, condition);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 17
+ * API Name : 판매상품 수정 API
+ * [PATCH] /merchandise/:merchandiseId/detail
+ */
+exports.updateMerchandise = async function (req, res) {
+  const { userId } = req.verifiedToken;
+  const { bodyId } = req.body;
+  const { merchandiseId } = req.params;
+
+  const { image_arr, categoryId, title, contents, price } = req.body;
+
+  // Request Error
+  const checkHost = await merchandiseProvider.checkHost(userId, merchandiseId);
+
+  if (checkHost === "false")
+    return res.send(errResponse(baseResponse.USERID_IS_NOT_HOST)); // 2015
+
+  if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
+
+  if (userId !== bodyId)
+    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkCategoryExist = await merchandiseProvider.checkCategoryExist(
+    categoryId
+  );
+
+  if (checkCategoryExist === 0)
+    return res.send(errResponse(baseResponse.CATEGORY_IS_NOT_EXIST)); // 2012
+
+  const result = await merchandiseService.updateMerchandise(
+    merchandiseId,
+    categoryId,
+    title,
+    contents,
+    price,
+    image_arr
+  );
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};

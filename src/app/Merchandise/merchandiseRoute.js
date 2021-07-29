@@ -31,7 +31,7 @@ module.exports = function (app) {
 
   // 13. 판매상품 삭제 API
   app.patch(
-    "/merchandise/:merchandiseId/status",
+    "/merchandise/:merchandiseId",
     jwtMiddleware,
     merchandise.deleteMerchandise
   );
@@ -41,5 +41,26 @@ module.exports = function (app) {
     "/merchandise/:merchandiseId/pull-up",
     jwtMiddleware,
     merchandise.pullUpMerchandise
+  );
+
+  // 15. 판매상품 상태 변경 API
+  app.patch(
+    "/merchandise/:merchandiseId/status",
+    jwtMiddleware,
+    merchandise.updateMerchandiseStatus
+  );
+
+  // 16. 내 판매상품 조회 API
+  app.get(
+    "/merchandise/my-merchandise",
+    jwtMiddleware,
+    merchandise.getMyMerchandise
+  );
+
+  // 17. 판매상품 수정 API
+  app.patch(
+    "/merchandise/:merchandiseId/detail",
+    jwtMiddleware,
+    merchandise.updateMerchandise
   );
 };
