@@ -8,25 +8,61 @@ const regexEmail = require("regex-email");
 const { emit } = require("nodemon");
 
 /**
- * API No. 1
- * API Name : 획득 매너 조회
- * [GET] /manner
+ * API No. 18
+ * API Name : 매너 조회 API
+ * [GET] /manner/:selectedId
  */
-exports.getMannerByUserId = async function (req, res) {
-  const userId = req.verifiedToken.userId;
+exports.getManner = async function (req, res) {
+  const { userId } = req.verifiedToken;
+  const { bodyId } = req.body;
 
-  const result = await mannerProvider.getMannerByUserId(userId);
+  const { selectedId } = req.params;
+
+  // Request Error
+  if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
+
+  if (userId !== bodyId)
+    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkUserExist = await mannerProvider.checkUserExist(selectedId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2007
+
+  const result = await mannerProvider.getManner(selectedId);
+
   return res.send(response(baseResponse.SUCCESS, result));
 };
 
 /**
- * API No. 2
- * API Name : 획득 매너 추가
- * [POST] /manner
+ * API No. 19
+ * API Name : 매너 추가 API
+ * [POST] /manner/:selectedId
  */
-exports.createMannerAcheived = async function (req, res) {
-  const { userId, mannerId } = req.body;
+exports.createManner = async function (req, res) {
+  const { userId } = req.verifiedToken;
+  const { bodyId } = req.body;
 
-  const result = await mannerService.createMannerAcheived(userId, mannerId);
-  return res.send(result);
+  const { selectedId } = req.params;
+  const { mannerId_arr } = req.body;
+
+  // Request Error
+  if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
+
+  if (userId !== bodyId)
+    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkUserExist = await mannerProvider.checkUserExist(selectedId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2007
+
+  const checkMannerExist = await mannerProvider.checkMannerExist(mannerId_arr);
+
+  if (checkMannerExist === 0)
+    return res.send(errResponse(baseResponse.MANNER_IS_NOT_EXIST)); // 2016
+
+  const result = await mannerService.createManner(selectedId, mannerId_arr);
+
+  return res.send(response(baseResponse.SUCCESS, result));
 };

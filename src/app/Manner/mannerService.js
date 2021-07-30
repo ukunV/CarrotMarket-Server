@@ -13,18 +13,22 @@ const { connect } = require("http2");
 
 // Service: Create, Update, Delete 비즈니스 로직 처리
 
-exports.createMannerAcheived = async function (userId, mannerId) {
+// 매너 추가
+exports.createManner = async function (selectedId, mannerId_arr) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
-    const params = [userId, mannerId];
-    const result = await mannerDao.insertMannerAcheived(connection, params);
 
-    console.log(`매너 추가 : ${result}`);
+    const result = await mannerDao.insertManner(
+      connection,
+      selectedId,
+      mannerId_arr
+    );
 
     connection.release();
-    return response(baseResponse.SUCCESS);
-  } catch {
-    logger.error(`createBadge Service error\n: ${err.message}`);
+
+    return result;
+  } catch (err) {
+    logger.error(`createManner Service error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
