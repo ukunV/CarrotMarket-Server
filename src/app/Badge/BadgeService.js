@@ -14,16 +14,22 @@ const { connect } = require("http2");
 // Service: Create, Update, Delete 비즈니스 로직 처리
 
 // 대표 배지 변경
+
 exports.updateMainBadge = async function (userId, badgeId) {
+  const connection = await pool.getConnection(async (conn) => conn);
   try {
-    const connection = await pool.getConnection(async (conn) => conn);
+    await connection.beginTransaction();
 
     const result = await badgeDao.updateMainBadge(connection, userId, badgeId);
+
+    await connection.commit();
 
     connection.release();
 
     return result;
   } catch (err) {
+    await connection.rollback();
+    connection.release();
     logger.error(`updateMainBadge Service error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }

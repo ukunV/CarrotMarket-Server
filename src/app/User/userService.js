@@ -14,31 +14,41 @@ const { connect } = require("http2");
 // Service: Create, Update, Delete 비즈니스 로직 처리
 
 exports.createUser = async function (hashedPhoneNum, nickname) {
+  const connection = await pool.getConnection(async (conn) => conn);
   try {
-    const connection = await pool.getConnection(async (conn) => conn);
+    await connection.beginTransaction();
 
     const params = [hashedPhoneNum, nickname];
     const result = await userDao.insertUserInfo(connection, params);
-    console.log(`추가된 회원 : ${result[0].insertId}`);
+
+    await connection.commit();
 
     connection.release();
     return result;
   } catch (err) {
+    await connection.rollback();
+    connection.release();
     logger.error(`createUser Service error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
 
 exports.updateUserProfile = async function (photoURL, nickname, userId) {
+  const connection = await pool.getConnection(async (conn) => conn);
   try {
-    const connection = await pool.getConnection(async (conn) => conn);
+    await connection.beginTransaction();
 
     const params = [photoURL, nickname, userId];
     const result = await userDao.updateUserProfile(connection, params);
+
+    await connection.commit();
+
     connection.release();
 
     return result;
   } catch (err) {
+    await connection.rollback();
+    connection.release();
     logger.error(`updateUserProfile Service error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }

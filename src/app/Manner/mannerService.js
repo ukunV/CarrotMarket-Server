@@ -15,8 +15,9 @@ const { connect } = require("http2");
 
 // 매너 추가
 exports.createManner = async function (selectedId, mannerId_arr) {
+  const connection = await pool.getConnection(async (conn) => conn);
   try {
-    const connection = await pool.getConnection(async (conn) => conn);
+    await connection.beginTransaction();
 
     const result = await mannerDao.insertManner(
       connection,
@@ -24,10 +25,14 @@ exports.createManner = async function (selectedId, mannerId_arr) {
       mannerId_arr
     );
 
+    await connection.commit();
+
     connection.release();
 
     return result;
   } catch (err) {
+    await connection.rollback();
+    connection.release();
     logger.error(`createManner Service error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }

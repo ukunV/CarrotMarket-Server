@@ -22,8 +22,9 @@ exports.createMerchandise = async function (
   price,
   image_arr
 ) {
+  const connection = await pool.getConnection(async (conn) => conn);
   try {
-    const connection = await pool.getConnection(async (conn) => conn);
+    await connection.beginTransaction();
 
     const result = await merchandiseDao.insertMerchandise(
       connection,
@@ -35,10 +36,14 @@ exports.createMerchandise = async function (
       image_arr
     );
 
+    await connection.commit();
+
     connection.release();
 
     return result;
   } catch (err) {
+    await connection.rollback();
+    connection.release();
     logger.error(`createMerchandise Service error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
@@ -46,17 +51,23 @@ exports.createMerchandise = async function (
 
 // 판매상품 삭제
 exports.deleteMerchandise = async function (merchandiseId) {
+  const connection = await pool.getConnection(async (conn) => conn);
   try {
-    const connection = await pool.getConnection(async (conn) => conn);
+    await connection.beginTransaction();
+
     const result = await merchandiseDao.deleteMerchandise(
       connection,
       merchandiseId
     );
 
+    await connection.commit();
+
     connection.release();
 
     return result;
   } catch (err) {
+    await connection.rollback();
+    connection.release();
     logger.error(`deleteMerchandise Service error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
@@ -64,18 +75,24 @@ exports.deleteMerchandise = async function (merchandiseId) {
 
 // 판매상품 끌어올리기
 exports.pullUpMerchandise = async function (price, merchandiseId) {
+  const connection = await pool.getConnection(async (conn) => conn);
   try {
-    const connection = await pool.getConnection(async (conn) => conn);
+    await connection.beginTransaction();
+
     const result = await merchandiseDao.pullUpMerchandise(
       connection,
       price,
       merchandiseId
     );
 
+    await connection.commit();
+
     connection.release();
 
     return result;
   } catch (err) {
+    await connection.rollback();
+    connection.release();
     logger.error(`pullUpMerchandise Service error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
@@ -83,8 +100,9 @@ exports.pullUpMerchandise = async function (price, merchandiseId) {
 
 // 판매상품 상태 변경
 exports.updateMerchandiseStatus = async function (status, merchandiseId) {
+  const connection = await pool.getConnection(async (conn) => conn);
   try {
-    const connection = await pool.getConnection(async (conn) => conn);
+    await connection.beginTransaction();
 
     const params = [status, merchandiseId];
     const result = await merchandiseDao.updateMerchandiseStatus(
@@ -92,10 +110,14 @@ exports.updateMerchandiseStatus = async function (status, merchandiseId) {
       params
     );
 
+    await connection.commit();
+
     connection.release();
 
     return result;
   } catch (err) {
+    await connection.rollback();
+    connection.release();
     logger.error(`updateMerchandiseStatus Service error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
@@ -110,8 +132,9 @@ exports.updateMerchandise = async function (
   price,
   image_arr
 ) {
+  const connection = await pool.getConnection(async (conn) => conn);
   try {
-    const connection = await pool.getConnection(async (conn) => conn);
+    await connection.beginTransaction();
 
     const result = await merchandiseDao.updateMerchandise(
       connection,
@@ -123,10 +146,14 @@ exports.updateMerchandise = async function (
       image_arr
     );
 
+    await connection.commit();
+
     connection.release();
 
     return result;
   } catch (err) {
+    await connection.rollback();
+    connection.release();
     logger.error(`updateMerchandise Service error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
