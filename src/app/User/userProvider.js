@@ -10,6 +10,7 @@ const userDao = require("./userDao");
 exports.phoneNumCheck = async function (hashedPhoneNum) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const result = await userDao.selectUserPhoneNum(connection, hashedPhoneNum);
     connection.release();
 
@@ -24,6 +25,7 @@ exports.phoneNumCheck = async function (hashedPhoneNum) {
 exports.nicknameCheck = async function (nickname) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const result = await userDao.selectUserNickname(connection, nickname);
     connection.release();
 
@@ -38,6 +40,7 @@ exports.nicknameCheck = async function (nickname) {
 exports.getUserId = async function (hashedPhoneNum) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const result = await userDao.selectUserId(connection, hashedPhoneNum);
     connection.release();
 
@@ -52,6 +55,7 @@ exports.getUserId = async function (hashedPhoneNum) {
 exports.getUserProfile = async function (selectId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const result = await userDao.selectUserProfile(connection, selectId);
     connection.release();
 
@@ -66,6 +70,7 @@ exports.getUserProfile = async function (selectId) {
 exports.checkExist = async function (selectId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const result = await userDao.checkExist(connection, selectId);
 
     connection.release();
@@ -81,6 +86,7 @@ exports.checkExist = async function (selectId) {
 exports.checkStatus = async function (selectId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const result = await userDao.checkStatus(connection, selectId);
 
     connection.release();
@@ -96,6 +102,7 @@ exports.checkStatus = async function (selectId) {
 exports.getMyCarrot = async function (userId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const result = await userDao.selectMyCarrot(connection, userId);
     connection.release();
 

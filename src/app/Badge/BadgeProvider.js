@@ -10,6 +10,7 @@ const badgeDao = require("./BadgeDao");
 exports.getBadge = async function (selectedId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const result = await badgeDao.selectBadge(connection, selectedId);
 
     connection.release();
@@ -25,6 +26,7 @@ exports.getBadge = async function (selectedId) {
 exports.checkUserExist = async function (selectedId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const result = await badgeDao.checkUserExist(connection, selectedId);
 
     connection.release();
@@ -40,6 +42,7 @@ exports.checkUserExist = async function (selectedId) {
 exports.checkBadgeExist = async function (badgeId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const result = await badgeDao.checkBadgeExist(connection, badgeId);
 
     connection.release();
@@ -55,6 +58,7 @@ exports.checkBadgeExist = async function (badgeId) {
 exports.getBadgeDetail = async function (badgeId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const result = await badgeDao.getBadgeDetail(connection, badgeId);
 
     connection.release();
@@ -70,6 +74,7 @@ exports.getBadgeDetail = async function (badgeId) {
 exports.checkIsGold = async function (badgeId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const result = await badgeDao.checkIsGold(connection, badgeId);
 
     connection.release();
@@ -85,6 +90,7 @@ exports.checkIsGold = async function (badgeId) {
 exports.checkIsAcheived = async function (userId, badgeId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const params = [userId, badgeId];
     const result = await badgeDao.checkIsAcheived(connection, params);
 
@@ -101,6 +107,7 @@ exports.checkIsAcheived = async function (userId, badgeId) {
 exports.checkAlreadyMain = async function (userId, badgeId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const params = [userId, badgeId];
     const result = await badgeDao.checkAlreadyMain(connection, params);
 

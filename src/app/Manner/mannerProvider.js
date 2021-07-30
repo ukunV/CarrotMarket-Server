@@ -10,6 +10,7 @@ const mannerDao = require("./mannerDao");
 exports.getManner = async function (selectedId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const result = await mannerDao.selectManner(connection, selectedId);
 
     connection.release();
@@ -25,6 +26,7 @@ exports.getManner = async function (selectedId) {
 exports.checkUserExist = async function (selectedId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const result = await mannerDao.checkUserExist(connection, selectedId);
 
     connection.release();
@@ -40,6 +42,7 @@ exports.checkUserExist = async function (selectedId) {
 exports.checkMannerExist = async function (mannerId_arr) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const result = await mannerDao.checkMannerExist(connection, mannerId_arr);
 
     connection.release();

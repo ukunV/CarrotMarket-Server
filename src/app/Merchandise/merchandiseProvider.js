@@ -10,10 +10,12 @@ const merchandiseDao = require("./merchandiseDao");
 exports.checkLocationExist = async function (locationId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const result = await merchandiseDao.checkLocationExist(
       connection,
       locationId
     );
+
     connection.release();
 
     return result;
@@ -45,10 +47,12 @@ exports.getAllMerchandise = async function (locationId) {
 exports.getMerchandise = async function (merchandiseId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const result = await merchandiseDao.selectMerchandise(
       connection,
       merchandiseId
     );
+
     connection.release();
 
     return result;
@@ -62,10 +66,12 @@ exports.getMerchandise = async function (merchandiseId) {
 exports.checkMerchandiseExist = async function (merchandiseId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const result = await merchandiseDao.checkMerchandiseExist(
       connection,
       merchandiseId
     );
+
     connection.release();
 
     return result;
@@ -99,6 +105,7 @@ exports.checkHost = async function (userId, merchandiseId) {
 exports.checkMerchandiseIsDeleted = async function (merchandiseId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const result = await merchandiseDao.checkMerchandiseIsDeleted(
       connection,
       merchandiseId
@@ -116,7 +123,9 @@ exports.checkMerchandiseIsDeleted = async function (merchandiseId) {
 exports.getCategory = async function () {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const result = await merchandiseDao.selectCategory(connection);
+
     connection.release();
 
     return result;
@@ -130,10 +139,12 @@ exports.getCategory = async function () {
 exports.checkCategoryExist = async function (categoryId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const result = await merchandiseDao.checkCategoryExist(
       connection,
       categoryId
     );
+
     connection.release();
 
     return result;

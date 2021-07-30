@@ -10,6 +10,7 @@ const reviewDao = require("./reviewDao");
 exports.getReview = async function (selectId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
+
     const result = await reviewDao.selectReview(connection, selectId);
 
     connection.release();
