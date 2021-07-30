@@ -136,13 +136,13 @@ exports.getMyCarrot = async function (req, res) {
 /**
  * API No. 3
  * API Name : 회원 프로필 조회 API
- * [GET] /user/:selectId/profile
- * Path Variable : userId
+ * [GET] /user/:selectedId/profile
+ * Path Variable : selectedId
  */
 exports.getUserProfile = async function (req, res) {
   const { userId } = req.verifiedToken;
   const { bodyId } = req.body;
-  const { selectId } = req.params;
+  const { selectedId } = req.params;
 
   // Request Error
   if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
@@ -150,17 +150,17 @@ exports.getUserProfile = async function (req, res) {
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
 
-  const checkExist = await userProvider.checkExist(selectId);
+  const checkExist = await userProvider.checkExist(selectedId);
 
   if (checkExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2007
 
-  const checkStatus = await userProvider.checkStatus(selectId);
+  const checkStatus = await userProvider.checkStatus(selectedId);
 
   if (checkStatus !== 1)
     return res.send(errResponse(baseResponse.USER_STATUS_IS_NOT_VALID)); // 2008
 
-  const result = await userProvider.getUserProfile(selectId);
+  const result = await userProvider.getUserProfile(selectedId);
 
   return res.send(response(baseResponse.SUCCESS, result));
 };
@@ -169,7 +169,6 @@ exports.getUserProfile = async function (req, res) {
  * API No. 4
  * API Name : 회원 프로필 수정 API
  * [PATCH] /user/profile
- * body : nickname
  */
 exports.updateUserProfile = async function (req, res) {
   const { userId } = req.verifiedToken;

@@ -10,12 +10,13 @@ const { emit } = require("nodemon");
 /**
  * API No. 5
  * API Name : 후기 조회 API
- * [GET] /review/:selectId
+ * [GET] /review/:selectedId
+ * Path Variable: selectedId
  */
 exports.getReview = async function (req, res) {
   const { userId } = req.verifiedToken;
   const { bodyId } = req.body;
-  const { selectId } = req.params;
+  const { selectedId } = req.params;
 
   // Request Error
   if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
@@ -23,7 +24,7 @@ exports.getReview = async function (req, res) {
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
 
-  const result = await reviewProvider.getReview(selectId);
+  const result = await reviewProvider.getReview(selectedId);
 
   return res.send(response(baseResponse.SUCCESS, result));
 };

@@ -52,11 +52,11 @@ exports.getUserId = async function (hashedPhoneNum) {
 };
 
 // 유저 프로필 조회
-exports.getUserProfile = async function (selectId) {
+exports.getUserProfile = async function (selectedId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await userDao.selectUserProfile(connection, selectId);
+    const result = await userDao.selectUserProfile(connection, selectedId);
     connection.release();
 
     return result;
@@ -67,11 +67,11 @@ exports.getUserProfile = async function (selectId) {
 };
 
 // 유저 존재 여부 check
-exports.checkExist = async function (selectId) {
+exports.checkExist = async function (selectedId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await userDao.checkExist(connection, selectId);
+    const result = await userDao.checkExist(connection, selectedId);
 
     connection.release();
 
@@ -83,11 +83,11 @@ exports.checkExist = async function (selectId) {
 };
 
 // 유저 상태 check
-exports.checkStatus = async function (selectId) {
+exports.checkStatus = async function (selectedId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await userDao.checkStatus(connection, selectId);
+    const result = await userDao.checkStatus(connection, selectedId);
 
     connection.release();
 

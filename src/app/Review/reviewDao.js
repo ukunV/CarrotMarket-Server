@@ -1,5 +1,5 @@
 // 후기 조회
-async function selectReview(connection, selectId) {
+async function selectReview(connection, selectedId) {
   const query = `
                 select u.nickname, u.photoURL, r.contents,
                       concat(l.address1, ' ', l.address2, ' ', l.address3) as address,
@@ -25,7 +25,7 @@ async function selectReview(connection, selectId) {
                 order by createdAt;
                 `;
 
-  const row = await connection.query(query, selectId);
+  const row = await connection.query(query, selectedId);
 
   return row[0];
 }

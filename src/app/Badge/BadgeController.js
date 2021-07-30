@@ -11,6 +11,7 @@ const { emit } = require("nodemon");
  * API No. 20
  * API Name : 획득 배지 조회 API
  * [GET] /badge/:selectedId/acheived
+ * Path Variable: selectedId
  */
 exports.getBadge = async function (req, res) {
   const { userId } = req.verifiedToken;
@@ -38,6 +39,7 @@ exports.getBadge = async function (req, res) {
  * API No. 21
  * API Name : 배지 상세내용 조회 API
  * [GET] /badge/:badgeId/detail
+ * Path Variable:badgeId
  */
 exports.getBadgeDetail = async function (req, res) {
   const { userId } = req.verifiedToken;
@@ -65,6 +67,7 @@ exports.getBadgeDetail = async function (req, res) {
  * API No. 22
  * API Name : 대표 배지 변경 API
  * [PATCH] /badge/:badgeId/main
+ * Path Variable: badgeId
  */
 exports.updateMainBadge = async function (req, res) {
   const { userId } = req.verifiedToken;

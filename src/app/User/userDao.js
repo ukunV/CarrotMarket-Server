@@ -72,7 +72,7 @@ async function selectMyCarrot(connection, userId) {
 }
 
 // 회원 프로필 조회
-async function selectUserProfile(connection, selectId) {
+async function selectUserProfile(connection, selectedId) {
   const query1 = `
                   select u.nickname, u.photoURL, concat('#', u.id) as id, u.mannerTemperature, u.hopeRate, u.responseRate,
                         ifnull(ba.count, 0) as badgeCount, ifnull(m.count, 0) as merchandiseCount
@@ -131,9 +131,9 @@ async function selectUserProfile(connection, selectId) {
                   limit 3;
                   `;
 
-  const result1 = await connection.query(query1, selectId);
-  const result2 = await connection.query(query2, selectId);
-  const result3 = await connection.query(query3, selectId);
+  const result1 = await connection.query(query1, selectedId);
+  const result2 = await connection.query(query2, selectedId);
+  const result3 = await connection.query(query3, selectedId);
 
   const information = JSON.parse(JSON.stringify(result1[0]));
   const manner = JSON.parse(JSON.stringify(result2[0]));
@@ -145,25 +145,25 @@ async function selectUserProfile(connection, selectId) {
 }
 
 // 유저 존재 여부 check
-async function checkExist(connection, selectId) {
+async function checkExist(connection, selectedId) {
   const query = `
         select exists(select id from User where id = ?) as exist;
                 `;
 
-  const row = await connection.query(query, selectId);
+  const row = await connection.query(query, selectedId);
 
   return row[0][0]["exist"];
 }
 
 // 유저 상태 check
-async function checkStatus(connection, selectId) {
+async function checkStatus(connection, selectedId) {
   const query = `
                 select status
                 from User
                 where id = ?
                 `;
 
-  const row = await connection.query(query, selectId);
+  const row = await connection.query(query, selectedId);
 
   return row[0][0]["status"];
 }

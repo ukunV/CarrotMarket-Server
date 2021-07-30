@@ -11,6 +11,7 @@ const { emit } = require("nodemon");
  * API No. 18
  * API Name : 매너 조회 API
  * [GET] /manner/:selectedId
+ * Path Variable: selectedId
  */
 exports.getManner = async function (req, res) {
   const { userId } = req.verifiedToken;
@@ -38,6 +39,7 @@ exports.getManner = async function (req, res) {
  * API No. 19
  * API Name : 매너 추가 API
  * [POST] /manner/:selectedId
+ * Path Variable: selectedId
  */
 exports.createManner = async function (req, res) {
   const { userId } = req.verifiedToken;

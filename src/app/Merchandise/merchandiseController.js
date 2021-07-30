@@ -172,6 +172,7 @@ exports.createMerchandise = async function (req, res) {
  * API No. 13
  * API Name : 판매상품 삭제 API
  * [PATCH] /merchandise/:merchandiseId
+ * Path Variable: merchandiseId
  */
 exports.deleteMerchandise = async function (req, res) {
   const { userId } = req.verifiedToken;
@@ -212,6 +213,7 @@ exports.deleteMerchandise = async function (req, res) {
  * API No. 14
  * API Name : 판매상품 끌어올기기 API
  * [PATCH] /merchandise/:merchandiseId/pull-up
+ * Path Variable: merchandiseId
  */
 exports.pullUpMerchandise = async function (req, res) {
   const { userId } = req.verifiedToken;
@@ -269,6 +271,7 @@ exports.pullUpMerchandise = async function (req, res) {
  * API No. 15
  * API Name : 판매상품 상태 변경 API
  * [PATCH] /merchandise/:merchandiseId/status
+ * Path Variable: merchandiseId
  */
 exports.updateMerchandiseStatus = async function (req, res) {
   const { userId } = req.verifiedToken;
@@ -349,6 +352,7 @@ exports.getMyMerchandise = async function (req, res) {
  * API No. 17
  * API Name : 판매상품 수정 API
  * [PATCH] /merchandise/:merchandiseId/detail
+ * Path Variable: merchandiseId
  */
 exports.updateMerchandise = async function (req, res) {
   const { userId } = req.verifiedToken;

@@ -7,11 +7,11 @@ const reviewDao = require("./reviewDao");
 // Provider: Read 비즈니스 로직 처리
 
 // 후기 조회
-exports.getReview = async function (selectId) {
+exports.getReview = async function (selectedId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await reviewDao.selectReview(connection, selectId);
+    const result = await reviewDao.selectReview(connection, selectedId);
 
     connection.release();
 
