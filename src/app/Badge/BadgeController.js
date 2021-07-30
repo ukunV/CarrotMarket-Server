@@ -8,43 +8,100 @@ const regexEmail = require("regex-email");
 const { emit } = require("nodemon");
 
 /**
- * API No. 1
- * API Name : 획득 배지 조회
- * [GET] /badge
+ * API No. 20
+ * API Name : 획득 배지 조회 API
+ * [GET] /badge/:selectedId/acheived
  */
-exports.getBadgeByUserId = async function (req, res) {
-  const userId = req.verifiedToken.userId;
+exports.getBadge = async function (req, res) {
+  const { userId } = req.verifiedToken;
+  const { bodyId } = req.body;
 
-  const result = await badgeProvider.getBadgeByUserId(userId);
+  const { selectedId } = req.params;
+
+  // Request Error
+  if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
+
+  if (userId !== bodyId)
+    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkUserExist = await badgeProvider.checkUserExist(selectedId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2007
+
+  const result = await badgeProvider.getBadge(selectedId);
+
   return res.send(response(baseResponse.SUCCESS, result));
 };
 
 /**
- * API No. 2
- * API Name : 배지 상세내용 조회
- * [GET] /badge/:badgeId
+ * API No. 21
+ * API Name : 배지 상세내용 조회 API
+ * [GET] /badge/:badgeId/detail
  */
-exports.getBadgeDescriptionByBadgeId = async function (req, res) {
-  const badgeId = req.params.badgeId;
+exports.getBadgeDetail = async function (req, res) {
+  const { userId } = req.verifiedToken;
+  const { bodyId } = req.body;
 
-  const result = await badgeProvider.getBadgeDescriptionByBadgeId(badgeId);
+  const { badgeId } = req.params;
+
+  // Request Error
+  if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
+
+  if (userId !== bodyId)
+    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkBadgeExist = await badgeProvider.checkBadgeExist(badgeId);
+
+  if (checkBadgeExist === 0)
+    return res.send(errResponse(baseResponse.BADGE_IS_NOT_EXIST)); // 2017
+
+  const result = await badgeProvider.getBadgeDetail(badgeId);
+
   return res.send(response(baseResponse.SUCCESS, result));
 };
 
 /**
- * API No. 3
- * API Name : 획득 배지 추가
- * [POST] /badge
+ * API No. 22
+ * API Name : 대표 배지 변경 API
+ * [PATCH] /badge/:badgeId/main
  */
-exports.createBadgeAcheived = async function (req, res) {
-  const { badgeId, userId } = req.body;
+exports.updateMainBadge = async function (req, res) {
+  const { userId } = req.verifiedToken;
+  const { bodyId } = req.body;
 
-  const result = await badgeService.createBadgeAcheived(badgeId, userId);
-  return res.send(result);
+  const { badgeId } = req.params;
+
+  // Request Error
+  if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
+
+  if (userId !== bodyId)
+    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkBadgeExist = await badgeProvider.checkBadgeExist(badgeId);
+
+  if (checkBadgeExist === 0)
+    return res.send(errResponse(baseResponse.BADGE_IS_NOT_EXIST)); // 2017
+
+  const checkIsGold = await badgeProvider.checkIsGold(badgeId);
+
+  if (checkIsGold === 0)
+    return res.send(errResponse(baseResponse.BADGE_IS_NOT_GOLD)); // 2018
+
+  const checkIsAcheived = await badgeProvider.checkIsAcheived(userId, badgeId);
+
+  if (checkIsAcheived === 0)
+    return res.send(errResponse(baseResponse.BADGE_IS_NOT_ACHEIVED)); // 2019
+
+  const checkAlreadyMain = await badgeProvider.checkAlreadyMain(
+    userId,
+    badgeId
+  );
+
+  if (checkAlreadyMain === 1)
+    return res.send(errResponse(baseResponse.BADGE_IS_ALREADY_MAIN)); // 2020
+
+  const result = await badgeService.updateMainBadge(userId, badgeId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
 };
-
-/**
- * API No. 4
- * API Name : 대표 배지 변경
- * [POST] /badge
- */

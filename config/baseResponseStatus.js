@@ -100,6 +100,26 @@ module.exports = {
     code: 2016,
     message: "존재하지 않는 매너가 포함되어 있습니다.",
   },
+  BADGE_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 2017,
+    message: "존재하지 않는 배지 입니다.",
+  },
+  BADGE_IS_NOT_GOLD: {
+    isSuccess: false,
+    code: 2018,
+    message: "황금배지만 대표배지로 설정할 수 있습니다.",
+  },
+  BADGE_IS_NOT_ACHEIVED: {
+    isSuccess: false,
+    code: 2019,
+    message: "획득하지 못한 배지입니다.",
+  },
+  BADGE_IS_ALREADY_MAIN: {
+    isSuccess: false,
+    code: 2020,
+    message: "해당 배지는 이미 대표 배지로 설정되어 있습니다.",
+  },
 
   // Response error
   MODIFY_REDUNDANT_NICKNAME: {

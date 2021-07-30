@@ -22,8 +22,8 @@ module.exports = function () {
   require("../src/app/User/userRoute")(app);
   require("../src/app/Review/reviewRoute")(app);
   require("../src/app/Merchandise/merchandiseRoute")(app);
-  require("../src/app/Badge/badgeRoute")(app);
   require("../src/app/Manner/mannerRoute")(app);
+  require("../src/app/Badge/badgeRoute")(app);
 
   return app;
 };
