@@ -1,92 +1,46 @@
-// 모든 유저 조회
-async function selectUser(connection) {
-  const selectUserListQuery = `
-                SELECT email, nickname 
-                FROM UserInfo;
+// 채팅방 목록 조회
+async function selectChatRoom(connection, userId) {
+  const query = `
+                select u.photoURL, u.nickname, cm.contents, mi.imageURL,
+                      case
+                          when datediff(now(), cr.updatedAt) > 364
+                              then concat(DATE_FORMAT(cr.updatedAt, '%y'), '년 ',DATE_FORMAT(cr.updatedAt, '%m'), '월 ', DATE_FORMAT(cr.updatedAt, '%d'), '일')
+                          when datediff(now(), cr.updatedAt) > 0
+                              then concat(DATE_FORMAT(cr.updatedAt, '%m'), '월 ', DATE_FORMAT(cr.updatedAt, '%d'), '일')
+                          when instr(DATE_FORMAT(cr.updatedAt, '%Y-%m-%d %p %h:%i'), 'PM') > 0
+                              THEN replace(DATE_FORMAT(cr.updatedAt, '%p %h:%i'), 'PM', '오후')
+                          else
+                              replace(DATE_FORMAT(cr.updatedAt, '%p %h:%i'), 'AM', '오전')
+                      end as updatedAt,
+                      case
+                          when ul.address1 != l.address1
+                              then concat(l.address1, ' ', l.address2, ' ', l.address3)
+                          when ul.address2 != l.address2
+                              then concat(l.address2, ' ', l.address3)
+                          else
+                              l.address3
+                      end as address
+                from User u
+                      left join Location l on u.locationId = l.id
+                      left join ChatRoom cr on u.id = cr.userOneId or u.id = cr.userTwoId
+                      left join Merchandise m on cr.merchandiseId = m.id
+                      left join MerchandiseImage mi on m.id = mi.merchandiseId
+                      left join ChatMessage cm on cr.id = cm.roomId,
+                    User uu
+                      left join Location ul on uu.locationId = ul.id
+                where (mi.number = 1 or mi.number is null)
+                and cr.updatedAt = cm.createdAt
+                and u.id != ?
+                and uu.id = ?
+                and (cr.userOneId = ? or cr.userTwoId = ?)
+                order by cr.updatedAt desc;
                 `;
-  const [userRows] = await connection.query(selectUserListQuery);
-  return userRows;
+
+  const row = await connection.query(query, [userId, userId, userId, userId]);
+
+  return row[0];
 }
-
-// 이메일로 회원 조회
-async function selectUserEmail(connection, email) {
-  const selectUserEmailQuery = `
-                SELECT email, nickname 
-                FROM UserInfo 
-                WHERE email = ?;
-                `;
-  const [emailRows] = await connection.query(selectUserEmailQuery, email);
-  return emailRows;
-}
-
-// userId 회원 조회
-async function selectUserId(connection, userId) {
-  const selectUserIdQuery = `
-                 SELECT id, email, nickname 
-                 FROM UserInfo 
-                 WHERE id = ?;
-                 `;
-  const [userRow] = await connection.query(selectUserIdQuery, userId);
-  return userRow;
-}
-
-// 유저 생성
-async function insertUserInfo(connection, insertUserInfoParams) {
-  const insertUserInfoQuery = `
-        INSERT INTO UserInfo(email, password, nickname)
-        VALUES (?, ?, ?);
-    `;
-  const insertUserInfoRow = await connection.query(
-    insertUserInfoQuery,
-    insertUserInfoParams
-  );
-
-  return insertUserInfoRow;
-}
-
-// 패스워드 체크
-async function selectUserPassword(connection, selectUserPasswordParams) {
-  const selectUserPasswordQuery = `
-        SELECT email, nickname, password
-        FROM UserInfo 
-        WHERE email = ? AND password = ?;`;
-  const selectUserPasswordRow = await connection.query(
-      selectUserPasswordQuery,
-      selectUserPasswordParams
-  );
-
-  return selectUserPasswordRow;
-}
-
-// 유저 계정 상태 체크 (jwt 생성 위해 id 값도 가져온다.)
-async function selectUserAccount(connection, email) {
-  const selectUserAccountQuery = `
-        SELECT status, id
-        FROM UserInfo 
-        WHERE email = ?;`;
-  const selectUserAccountRow = await connection.query(
-      selectUserAccountQuery,
-      email
-  );
-  return selectUserAccountRow[0];
-}
-
-async function updateUserInfo(connection, id, nickname) {
-  const updateUserQuery = `
-  UPDATE UserInfo 
-  SET nickname = ?
-  WHERE id = ?;`;
-  const updateUserRow = await connection.query(updateUserQuery, [nickname, id]);
-  return updateUserRow[0];
-}
-
 
 module.exports = {
-  selectUser,
-  selectUserEmail,
-  selectUserId,
-  insertUserInfo,
-  selectUserPassword,
-  selectUserAccount,
-  updateUserInfo,
+  selectChatRoom,
 };
