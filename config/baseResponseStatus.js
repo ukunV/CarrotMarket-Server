@@ -120,6 +120,11 @@ module.exports = {
     code: 2020,
     message: "해당 배지는 이미 대표 배지로 설정되어 있습니다.",
   },
+  STATUS_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2021,
+    message: "변경을 원하는 상태를 확인하세요.",
+  },
 
   // Response error
   MODIFY_REDUNDANT_NICKNAME: {

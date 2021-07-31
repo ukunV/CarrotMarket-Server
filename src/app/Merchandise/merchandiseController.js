@@ -282,15 +282,15 @@ exports.updateMerchandiseStatus = async function (req, res) {
   const { status } = req.body;
 
   // Request Error
-  const checkHost = await merchandiseProvider.checkHost(userId, merchandiseId);
-
-  if (checkHost === "false")
-    return res.send(errResponse(baseResponse.USERID_IS_NOT_HOST)); // 2015
-
   if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
 
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkHost = await merchandiseProvider.checkHost(userId, merchandiseId);
+
+  if (checkHost === "false")
+    return res.send(errResponse(baseResponse.USERID_IS_NOT_HOST)); // 2015
 
   const checkMerchandiseExist = await merchandiseProvider.checkMerchandiseExist(
     merchandiseId
@@ -304,6 +304,9 @@ exports.updateMerchandiseStatus = async function (req, res) {
 
   if (checkMerchandiseIsDeleted === 0)
     return res.send(errResponse(baseResponse.MERCHANDISE_IS_DELETED)); // 2011
+
+  if (!(status in [1, 2, 3]))
+    return res.send(errResponse(baseResponse.STATUS_IS_NOT_VALID)); // 2021
 
   const result = await merchandiseService.updateMerchandiseStatus(
     status,
