@@ -1,4 +1,6 @@
 node_modules/*
 config/database.js
 config/secret.js
+config/ncp_client.js
+config/ncp_config.js
 log/*

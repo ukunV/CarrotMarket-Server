@@ -10,8 +10,11 @@ const jwt = require("jsonwebtoken");
 const regexEmail = require("regex-email");
 const { emit } = require("nodemon");
 
+const { NCPClient } = require("../../../config/ncp_client");
+const sensKey = require("../../../config/ncp_config").sensSecret;
+
 // 랜덤 닉네임 생성 함수
-function createCode(numeric, alphabet) {
+function createNickname(numeric, alphabet) {
   let randomStr = "";
 
   for (let j = 0; j < 5; j++) {
@@ -25,6 +28,13 @@ function createCode(numeric, alphabet) {
   return randomStr;
 }
 
+// 랜덤 인증번호 생성 함수
+function createAuthNum() {
+  const randNum = Math.floor(Math.random() * 9000) + 1000;
+
+  return randNum;
+}
+
 // Regex
 const regPhoneNum = /^\d{3}\d{3,4}\d{4}$/;
 
@@ -34,8 +44,29 @@ const regPhoneNum = /^\d{3}\d{3,4}\d{4}$/;
  * [POST] /login
  */
 exports.createUser = async function (req, res) {
-  // Request Body
-  const { userPhoneNum, auth } = req.body;
+  const { userPhoneNum, bodyAuth } = req.body;
+
+  const sendAuth = createAuthNum();
+
+  // 전화번호 입력 후 인증번호 입력 구현 방법 (수정필요)
+  const ncp = new NCPClient({
+    ...sensKey,
+  });
+
+  const to = userPhoneNum;
+  const contents = `[당근마켓] 인증번호 [${sendAuth}]`;
+
+  const { success, status, msg } = await ncp.sendSMS({
+    to,
+    contents,
+  });
+
+  if (!success) {
+    console.log(
+      `(ERROR) node-sens error: ${msg}, Status ${status} Date ${Date.now()}`
+    );
+    res.send("SMS 전송 중 오류가 발생했습니다.");
+  }
 
   // Request Error Check
   if (!userPhoneNum)
@@ -44,10 +75,9 @@ exports.createUser = async function (req, res) {
   if (!regPhoneNum.test(userPhoneNum))
     return res.send(errResponse(baseResponse.SIGNUP_PHONENUM_ERROR_TYPE)); // 2002
 
-  if (!auth) return res.send(errResponse(baseResponse.SIGNUP_AUTH_EMPTY)); // 2003
+  if (!bodyAuth) return res.send(errResponse(baseResponse.SIGNUP_AUTH_EMPTY)); // 2003
 
-  if (auth !== 1234)
-    // 인증번호 api 구현 전
+  if (bodyAuth !== sendAuth)
     return res.send(errResponse(baseResponse.SIGNUP_AUTH_NOT_MATCH)); // 2004
 
   // 휴대폰 번호 암호화
@@ -85,7 +115,7 @@ exports.createUser = async function (req, res) {
     const alphabet = `a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,
        A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z`.split(",");
 
-    const nickname = createCode(numeric, alphabet);
+    const nickname = createNickname(numeric, alphabet);
     const checkUserNickname = await userProvider.nicknameCheck(nickname);
 
     // 회원가입 후 바로 로그인
