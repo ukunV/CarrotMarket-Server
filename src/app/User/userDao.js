@@ -74,7 +74,9 @@ async function selectMyCarrot(connection, userId) {
 // 회원 프로필 조회
 async function selectUserProfile(connection, selectedId) {
   const query1 = `
-                  select u.nickname, u.photoURL, concat('#', u.id) as id, u.mannerTemperature, u.hopeRate, u.responseRate,
+                  select u.nickname, u.photoURL, concat('#', u.id) as id,
+                        concat(u.mannerTemperature, '°C') as mannerTemperature,
+                        concat(u.hopeRate, '%') as hopeRate, concat(u.responseRate, '%') as responseRate,
                         ifnull(ba.count, 0) as badgeCount, ifnull(m.count, 0) as merchandiseCount
                   from User u
                         left join (select userId, count(userId) as count from BadgeAcheived group by userId) as ba on u.id = ba.userId
@@ -126,8 +128,8 @@ async function selectUserProfile(connection, selectedId) {
                   where r.id is not null
                   and ur.id is not null
                   and r.userId = ?
-                  group by u.id
-                  order by createdAt
+                  group by r.id
+                  order by ur.createdAt
                   limit 3;
                   `;
 

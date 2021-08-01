@@ -9,7 +9,7 @@ async function checkLocationExist(connection, locationId) {
   return row[0][0]["exist"];
 }
 
-// 동네별 최신수 판매 상품 조회
+// 동네별 최신순 판매 상품 조회
 async function selectAllMerchandise(connection, locationId) {
   const query = `
                 select m.title, mi.imageURL, l.address3 as address, m.price, ifnull(lc.likeCount, 0) as likeCount,
@@ -72,49 +72,60 @@ async function selectMerchandise(connection, merchandiseId) {
                     `;
 
   const query2 = `
-                    select u.nickname, l.address3 as address, u.mannerTemperature,
-                            m.title, mc.categoryName, m.contents, m.price,
-                            ifnull(lc.likeCount, 0) as likeCount,
-                            ifnull(v.viewCount, 0) as viewCount,
-                            case
-                                when timestampdiff(year, m.pulledUpAt, now()) > 0 and m.pulledUpCount > 0
-                                    then concat('끌올 ', timestampdiff(year, m.pulledUpAt, now()), '년 전')
-                                when timestampdiff(year, m.createdAt, now()) > 0
-                                    then concat(timestampdiff(year, m.createdAt, now()), '년 전')
-                                when timestampdiff(month, m.pulledUpAt, now()) > 0 and m.pulledUpCount > 0
-                                    then concat('끌올 ', timestampdiff(month, m.pulledUpAt, now()), '달 전')
-                                when timestampdiff(month, m.createdAt, now()) > 0
-                                    then concat(timestampdiff(month, m.createdAt, now()), '달 전')
-                                when timestampdiff(day, m.pulledUpAt, now()) > 0 and m.pulledUpCount > 0
-                                    then concat('끌올 ', timestampdiff(day, m.pulledUpAt, now()), '일 전')
-                                when timestampdiff(day, m.createdAt, now()) > 0
-                                    then concat(timestampdiff(day, m.createdAt, now()), '일 전')
-                                when hour (timediff(m.pulledUpAt, now())) > 0 and m.pulledUpCount > 0
-                                    then concat('끌올 ', hour(timediff(m.pulledUpAt, now())), '시간 전')
-                                when hour(timediff(m.createdAt, now())) > 0
-                                    then concat(hour(timediff(m.createdAt, now())), '년 전')
-                                when minute(timediff(m.pulledUpAt, now())) > 0 and m.pulledUpCount > 0
-                                    then concat('끌올 ', minute(timediff(m.pulledUpAt, now())), '분 전')
-                                when minute(timediff(m.createdAt, now())) > 0
-                                    then concat(minute(timediff(m.createdAt, now())), '년 전')
-                                when second(timediff(m.pulledUpAt, now())) > 0 and m.pulledUpCount > 0
-                                    then concat('끌올 ', second(timediff(m.pulledUpAt, now())), '초 전')
-                                when second(timediff(m.createdAt, now())) > 0
-                                    then concat(second(timediff(m.createdAt, now())), '년 전')
-                            end as createdAt
-                    from User u
-                    left join Location l on u.locationId = l.id
-                    left join Merchandise m on u.id = m.userId
-                    left join MerchandiseCategory mc on mc.id = m.categoryId
-                    left join (select ml.id, count(ml.id) as likeCount
-                            from MerchandiseLike ml
-                            where ml.isDeleted = 1
-                            group by ml.merchandiseId) as lc on m.id = lc.id
-                    left join (select mv.id, count(mv.id) as viewCount
-                            from MerchandiseViews mv
-                            group by mv.merchandiseId) as v on m.id = v.id
-                    where m.id = ?;
-                    `;
+                  select u.nickname, l.address3 as address,
+                          concat(u.mannerTemperature, '°C') as mannerTemperature,
+                          m.title, mc.categoryName, m.contents, m.price,
+                          case
+                              when m.status = 0
+                                  then '예약중'
+                              when m.status = 1
+                                  then '거래중'
+                              when m.status = 2
+                                  then '거래완료'
+                              when m.status = 3
+                                  then '거래중지'
+                          end as status,
+                          ifnull(lc.likeCount, 0) as likeCount,
+                          ifnull(v.viewCount, 0) as viewCount,
+                          case
+                              when timestampdiff(year, m.pulledUpAt, now()) > 0 and m.pulledUpCount > 0
+                                  then concat('끌올 ', timestampdiff(year, m.pulledUpAt, now()), '년 전')
+                              when timestampdiff(year, m.createdAt, now()) > 0
+                                  then concat(timestampdiff(year, m.createdAt, now()), '년 전')
+                              when timestampdiff(month, m.pulledUpAt, now()) > 0 and m.pulledUpCount > 0
+                                  then concat('끌올 ', timestampdiff(month, m.pulledUpAt, now()), '달 전')
+                              when timestampdiff(month, m.createdAt, now()) > 0
+                                  then concat(timestampdiff(month, m.createdAt, now()), '달 전')
+                              when timestampdiff(day, m.pulledUpAt, now()) > 0 and m.pulledUpCount > 0
+                                  then concat('끌올 ', timestampdiff(day, m.pulledUpAt, now()), '일 전')
+                              when timestampdiff(day, m.createdAt, now()) > 0
+                                  then concat(timestampdiff(day, m.createdAt, now()), '일 전')
+                              when hour (timediff(m.pulledUpAt, now())) > 0 and m.pulledUpCount > 0
+                                  then concat('끌올 ', hour(timediff(m.pulledUpAt, now())), '시간 전')
+                              when hour(timediff(m.createdAt, now())) > 0
+                                  then concat(hour(timediff(m.createdAt, now())), '년 전')
+                              when minute(timediff(m.pulledUpAt, now())) > 0 and m.pulledUpCount > 0
+                                  then concat('끌올 ', minute(timediff(m.pulledUpAt, now())), '분 전')
+                              when minute(timediff(m.createdAt, now())) > 0
+                                  then concat(minute(timediff(m.createdAt, now())), '년 전')
+                              when second(timediff(m.pulledUpAt, now())) > 0 and m.pulledUpCount > 0
+                                  then concat('끌올 ', second(timediff(m.pulledUpAt, now())), '초 전')
+                              when second(timediff(m.createdAt, now())) > 0
+                                  then concat(second(timediff(m.createdAt, now())), '년 전')
+                          end as createdAt
+                  from User u
+                        left join Location l on u.locationId = l.id
+                        left join Merchandise m on u.id = m.userId
+                        left join MerchandiseCategory mc on mc.id = m.categoryId
+                        left join (select ml.id, count(ml.id) as likeCount
+                                    from MerchandiseLike ml
+                                    where ml.isDeleted = 1
+                                    group by ml.merchandiseId) as lc on m.id = lc.id
+                        left join (select mv.id, count(mv.id) as viewCount
+                                    from MerchandiseViews mv
+                                    group by mv.merchandiseId) as v on m.id = v.id
+                  where m.id = ?;
+                  `;
 
   const result1 = await connection.query(query1, merchandiseId);
   const result2 = await connection.query(query2, merchandiseId);

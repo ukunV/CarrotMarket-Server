@@ -9,7 +9,7 @@ const { emit } = require("nodemon");
 
 /**
  * API No. 8
- * API Name : 동네별 최신순 판매 상품 조회 API
+ * API Name : 동네별 최신순 판매 상품(거래중) 조회 API
  * [GET] /merchandise/:locationId/on-sale
  * Path Variable: locationId
  */
@@ -45,7 +45,8 @@ exports.getAllMerchandise = async function (req, res) {
 exports.getMerchandise = async function (req, res) {
   const { userId } = req.verifiedToken;
   const { bodyId } = req.body;
-  const { merchandiseId } = req.query;
+
+  const { merchandiseId } = req.params;
 
   // Request Error
   if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
@@ -93,7 +94,7 @@ exports.getCategory = async function (req, res) {
 
 /**
  * API No. 11
- * API Name : 카테고리별 최신순 판매상품 조회 API
+ * API Name : 카테고리별 최신순 판매상품(거래중) 조회 API
  * [GET] /merchandise/:locationId/category
  * path variable: locationId
  * query string: categoryId

@@ -91,30 +91,32 @@ async function checkRoomMember(connection, roomId, userId) {
 // 채팅방 조회
 async function selectChatRoom(connection, roomId) {
   const query = `
-                select u.id, u.nickname, u.photoURL, u.mannerTemperature, cm.contents,
-                        case
-                            when instr(DATE_FORMAT(cm.createdAt, '%Y년 %m월 %d일 %p %h:%i'), 'PM') > 0
-                            then replace(DATE_FORMAT(cm.createdAt, '%Y년 %m월 %d일 %p %h:%i'), 'PM', '오후')
-                        else
-                            replace(DATE_FORMAT(cm.createdAt, '%Y년 %m월 %d일 %p %h:%i'), 'AM', '오전')
-                        end as createAt,
-                        m.title, m.price,
-                        case
-                            when m.status = 0
-                                then '예약중'
-                            when m.status = 1
-                                then '거래중'
-                            when m.status = 2
-                                then '거래완료'
-                            when m.status = 3
-                                then '거래중지'
-                        end as status
+                select u.id, u.nickname, u.photoURL,
+                      concat(u.mannerTemperature, '°C') as mannerTemperature, cm.contents,
+                      DATE_FORMAT(cm.createdAt, '%Y년 %m월 %d일') as createdDate,
+                      case
+                          when instr(DATE_FORMAT(cm.createdAt, '%p %h:%i'), 'PM') > 0
+                          then replace(DATE_FORMAT(cm.createdAt, '%p %h:%i'), 'PM', '오후')
+                      else
+                          replace(DATE_FORMAT(cm.createdAt, '%p %h:%i'), 'AM', '오전')
+                      end as createdTime,
+                      m.title, m.price,
+                      case
+                          when m.status = 0
+                              then '예약중'
+                          when m.status = 1
+                              then '거래중'
+                          when m.status = 2
+                              then '거래완료'
+                          when m.status = 3
+                              then '거래중지'
+                      end as status
                 from ChatRoom cr
-                        left join ChatMessage cm on cr.id = cm.roomId
-                        left join User u on cm.authorId = u.id
-                        left join Merchandise m on m.id = cr.merchandiseId
+                      left join ChatMessage cm on cr.id = cm.roomId
+                      left join User u on cm.authorId = u.id
+                      left join Merchandise m on m.id = cr.merchandiseId
                 where cm.roomId = ?
-                order by createAt;
+                order by cm.createdAt;
                 `;
 
   const row = await connection.query(query, roomId);
