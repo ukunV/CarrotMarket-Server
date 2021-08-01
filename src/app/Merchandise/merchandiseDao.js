@@ -52,6 +52,7 @@ async function selectAllMerchandise(connection, locationId) {
                                     group by ml.merchandiseId) as lc on m.id = lc.id
                 where l.id = ?
                 and m.status = 1
+                and m.isHided = 1
                 and m.isDeleted = 1
                 and (mi.rn = 1 or mi.rn is null)
                 order by coalesce(m.pulledUpAt, m.createdAt) desc;
@@ -240,6 +241,7 @@ async function selectCategoryMerchandise(connection, params) {
                    where l.id = ?
                    and m.categoryId = ?
                    and m.status = 1
+                   and m.isHided = 1
                    and m.isDeleted = 1
                    and (mi.rn = 1 or mi.rn is null)
                    order by coalesce(m.pulledUpAt, m.createdAt) desc;
@@ -428,6 +430,7 @@ async function selectMyMerchandise(connection, userId, condition) {
                         group by ml.merchandiseId) as lc on m.id = lc.id
                 where (mi.number = 1 or mi.number is null)
                 and m.isDeleted = 1
+                and m.isHided = 1
                 and m.userId = ?
                 ` +
     condition +
@@ -502,7 +505,7 @@ async function updateMerchandise(
 }
 
 // 상품 숨기기 여부 check
-async function checkAlreadyHideOnOFF(connection, merchandiseId) {
+async function checkIsHided(connection, merchandiseId) {
   const query = `
                 select isHided
                 from Merchandise
@@ -543,8 +546,8 @@ async function updateMerchandiseHideOff(connection, merchandiseId) {
 // 숨긴 판매상품 조회
 async function selectMyHideMerchandise(connection, userId) {
   const query = `
-                select mi.imageURL, m.title, m.price, l.address3 as address,
-                        ifnull(lc.likeCount, 0) as likeCount, m.status, m.pulledUpCount,
+                select mi.imageURL, m.title, m.price, l.address3 as address, m.status, m.isHided,
+                        ifnull(lc.likeCount, 0) as likeCount, m.pulledUpCount,
                         count(cr.merchandiseId) as chatroomCount,
                         case
                             when timestampdiff(year, m.pulledUpAt, now()) > 0 and m.pulledUpCount > 0
@@ -611,7 +614,7 @@ module.exports = {
   checkHost,
   selectMyMerchandise,
   updateMerchandise,
-  checkAlreadyHideOnOFF,
+  checkIsHided,
   updateMerchandiseHideOn,
   updateMerchandiseHideOff,
   selectMyHideMerchandise,

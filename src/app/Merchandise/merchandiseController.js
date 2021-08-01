@@ -67,6 +67,12 @@ exports.getMerchandise = async function (req, res) {
   if (checkMerchandiseIsDeleted === 0)
     return res.send(errResponse(baseResponse.MERCHANDISE_IS_DELETED)); // 2011
 
+  const checkHost = await merchandiseProvider.checkHost(userId, merchandiseId);
+  const checkIsHided = await merchandiseProvider.checkIsHided(merchandiseId);
+
+  if (checkHost === "false" && checkIsHided === 0)
+    return res.send(errResponse(baseResponse.USERID_IS_NOT_HOST)); // 2015
+
   const result = await merchandiseProvider.getMerchandise(merchandiseId);
 
   return res.send(response(baseResponse.SUCCESS, result));
@@ -248,6 +254,11 @@ exports.pullUpMerchandise = async function (req, res) {
   if (checkHost === "false")
     return res.send(errResponse(baseResponse.USERID_IS_NOT_HOST)); // 2015
 
+  const checkIsHided = await merchandiseProvider.checkIsHided(merchandiseId);
+
+  if (checkIsHided === 0)
+    return res.send(errResponse(baseResponse.MERCHANDISE_HIDE_ON)); // 2024
+
   const checkPullUpPossible = await merchandiseProvider.checkPullUpPossible(
     merchandiseId
   );
@@ -305,6 +316,11 @@ exports.updateMerchandiseStatus = async function (req, res) {
 
   if (checkHost === "false")
     return res.send(errResponse(baseResponse.USERID_IS_NOT_HOST)); // 2015
+
+  const checkIsHided = await merchandiseProvider.checkIsHided(merchandiseId);
+
+  if (checkIsHided === 0)
+    return res.send(errResponse(baseResponse.MERCHANDISE_HIDE_ON)); // 2024
 
   if (!(status in [1, 2, 3]))
     return res.send(errResponse(baseResponse.STATUS_IS_NOT_VALID)); // 2021
@@ -436,7 +452,7 @@ exports.updateMerchandiseHideOn = async function (req, res) {
   );
 
   if (checkAlreadyHideOnOFF === 0)
-    return res.send(errResponse(baseResponse.MERCHANDISE_ALREADY_HIDE_ON)); // 2023
+    return res.send(errResponse(baseResponse.MERCHANDISE_HIDE_ON)); // 2024
 
   const result = await merchandiseService.updateMerchandiseHideOn(
     merchandiseId
@@ -486,7 +502,7 @@ exports.updateMerchandiseHideOff = async function (req, res) {
   );
 
   if (checkAlreadyHideOnOFF === 1)
-    return res.send(errResponse(baseResponse.MERCHANDISE_ALREADY_HIDE_OFF)); // 2024
+    return res.send(errResponse(baseResponse.MERCHANDISE_HIDE_OFF)); // 2025
 
   const result = await merchandiseService.updateMerchandiseHideOff(
     merchandiseId
