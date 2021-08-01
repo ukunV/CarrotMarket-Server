@@ -1,5 +1,5 @@
 // 채팅방 목록 조회
-async function selectChatRoom(connection, userId) {
+async function selectChatRoomList(connection, userId) {
   const query = `
                 select u.photoURL, u.nickname, cm.contents, mi.imageURL,
                       case
@@ -41,6 +41,91 @@ async function selectChatRoom(connection, userId) {
   return row[0];
 }
 
+// 채팅방 존재 여부 check
+async function checkRoomExist(connection, roomId) {
+  const query = `
+                select exists(select id from ChatRoom where id = ?) as exist;
+                `;
+
+  const row = await connection.query(query, roomId);
+
+  return row[0][0]["exist"];
+}
+
+// 채팅 전송
+async function createChat(connection, roomId, userId, contents) {
+  const query1 = `
+                insert into ChatMessage (roomId, authorId, contents)
+                values (?, ?, ?);
+                `;
+
+  const row1 = await connection.query(query1, [roomId, userId, contents]);
+
+  const query2 = `
+                update ChatRoom
+                set updatedAt = (select createdAt
+                                from ChatMessage
+                                where id = (select max(id) from ChatMessage))
+                where id = ?
+                `;
+
+  await connection.query(query2, roomId);
+
+  return row1[0];
+}
+
+// 채팅방 존재 여부 check
+async function checkRoomMember(connection, roomId, userId) {
+  const query = `
+                select exists(select id
+                                from ChatRoom
+                                where id = ?
+                                and (userOneId = ? or userTwoId = ?)) as exist;
+                `;
+
+  const row = await connection.query(query, [roomId, userId, userId]);
+
+  return row[0][0]["exist"];
+}
+
+// 채팅방 조회
+async function selectChatRoom(connection, roomId) {
+  const query = `
+                select u.id, u.nickname, u.photoURL, u.mannerTemperature, cm.contents,
+                        case
+                            when instr(DATE_FORMAT(cm.createdAt, '%Y년 %m월 %d일 %p %h:%i'), 'PM') > 0
+                            then replace(DATE_FORMAT(cm.createdAt, '%Y년 %m월 %d일 %p %h:%i'), 'PM', '오후')
+                        else
+                            replace(DATE_FORMAT(cm.createdAt, '%Y년 %m월 %d일 %p %h:%i'), 'AM', '오전')
+                        end as createAt,
+                        m.title, m.price,
+                        case
+                            when m.status = 0
+                                then '예약중'
+                            when m.status = 1
+                                then '거래중'
+                            when m.status = 2
+                                then '거래완료'
+                            when m.status = 3
+                                then '거래중지'
+                        end as status
+                from ChatRoom cr
+                        left join ChatMessage cm on cr.id = cm.roomId
+                        left join User u on cm.authorId = u.id
+                        left join Merchandise m on m.id = cr.merchandiseId
+                where cm.roomId = ?
+                order by createAt;
+                `;
+
+  const row = await connection.query(query, roomId);
+
+  return row[0];
+}
+
 module.exports = {
+  selectChatRoomList,
+  checkRoomExist,
+  createChat,
+  checkRoomMember,
   selectChatRoom,
 };

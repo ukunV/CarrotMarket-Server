@@ -125,6 +125,16 @@ module.exports = {
     code: 2021,
     message: "변경을 원하는 상태를 확인하세요.",
   },
+  CHATROOM_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 2022,
+    message: "존재하지 않는 채팅방입니다.",
+  },
+  NOT_IN_ROOM_MEMBER: {
+    isSuccess: false,
+    code: 2022,
+    message: "해당 채팅방에 속해있는 유저가 아닙니다.",
+  },
 
   // Response error
   MODIFY_REDUNDANT_NICKNAME: {
