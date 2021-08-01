@@ -14,7 +14,6 @@ const { connect } = require("http2");
 // Service: Create, Update, Delete 비즈니스 로직 처리
 
 // 대표 배지 변경
-
 exports.updateMainBadge = async function (userId, badgeId) {
   const connection = await pool.getConnection(async (conn) => conn);
   try {
