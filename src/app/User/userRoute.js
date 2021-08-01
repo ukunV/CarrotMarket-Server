@@ -3,7 +3,7 @@ module.exports = function (app) {
   const jwtMiddleware = require("../../../config/jwtMiddleware");
 
   // 1. 로그인 API (비회원일 경우 회원가입 후 로그인)
-  app.post("/login", user.createUser);
+  app.post("/user/login", user.createUser);
 
   // 2. 나의 당근 조회 API
   app.get("/user/my-carrot", jwtMiddleware, user.getMyCarrot);

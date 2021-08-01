@@ -132,17 +132,17 @@ module.exports = {
   },
   NOT_IN_ROOM_MEMBER: {
     isSuccess: false,
-    code: 2022,
+    code: 2023,
     message: "해당 채팅방에 속해있는 유저가 아닙니다.",
   },
   MERCHANDISE_ALREADY_HIDE_ON: {
     isSuccess: false,
-    code: 2023,
+    code: 2024,
     message: "해당 상품은 이미 숨기기 상태입니다.",
   },
   MERCHANDISE_ALREADY_HIDE_OFF: {
     isSuccess: false,
-    code: 2024,
+    code: 2025,
     message: "해당 상품은 이미 숨기기 상태가 아닙니다.",
   },
 

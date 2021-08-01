@@ -41,7 +41,7 @@ const regPhoneNum = /^\d{3}\d{3,4}\d{4}$/;
 /**
  * API No. 1
  * API Name : 로그인 API (비회원일 경우 회원가입 후 로그인)
- * [POST] /login
+ * [POST] /user/login
  */
 exports.createUser = async function (req, res) {
   const { userPhoneNum, bodyAuth } = req.body;
