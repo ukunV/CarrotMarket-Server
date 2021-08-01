@@ -63,4 +63,25 @@ module.exports = function (app) {
     jwtMiddleware,
     merchandise.updateMerchandise
   );
+
+  // 26. 판매상품 숨기기 API
+  app.patch(
+    "/merchandise/:merchandiseId/hide-on",
+    jwtMiddleware,
+    merchandise.updateMerchandiseHideOn
+  );
+
+  // 27. 판매상품 숨기기 해제 API
+  app.patch(
+    "/merchandise/:merchandiseId/hide-off",
+    jwtMiddleware,
+    merchandise.updateMerchandiseHideOff
+  );
+
+  // 28. 숨긴 판매상품 조회 API
+  app.get(
+    "/merchandise/hide/my-merchandise",
+    jwtMiddleware,
+    merchandise.getMyHideMerchandise
+  );
 };

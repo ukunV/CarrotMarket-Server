@@ -501,6 +501,99 @@ async function updateMerchandise(
   return result;
 }
 
+// 상품 숨기기 여부 check
+async function checkAlreadyHideOnOFF(connection, merchandiseId) {
+  const query = `
+                select isHided
+                from Merchandise
+                where id = ?;
+                `;
+
+  const row = await connection.query(query, merchandiseId);
+
+  return row[0][0]["isHided"];
+}
+
+// 판매상품 숨기기
+async function updateMerchandiseHideOn(connection, merchandiseId) {
+  const query = `
+                    update Merchandise
+                    set isHided = 0
+                    where id = ?;
+                    `;
+
+  const row = await connection.query(query, merchandiseId);
+
+  return row[0].info;
+}
+
+// 판매상품 숨기기 해제
+async function updateMerchandiseHideOff(connection, merchandiseId) {
+  const query = `
+                    update Merchandise
+                    set isHided = 1
+                    where id = ?;
+                    `;
+
+  const row = await connection.query(query, merchandiseId);
+
+  return row[0].info;
+}
+
+// 숨긴 판매상품 조회
+async function selectMyHideMerchandise(connection, userId) {
+  const query = `
+                select mi.imageURL, m.title, m.price, l.address3 as address,
+                        ifnull(lc.likeCount, 0) as likeCount, m.status, m.pulledUpCount,
+                        count(cr.merchandiseId) as chatroomCount,
+                        case
+                            when timestampdiff(year, m.pulledUpAt, now()) > 0 and m.pulledUpCount > 0
+                                then concat('끌올 ', timestampdiff(year, m.pulledUpAt, now()), '년 전')
+                            when timestampdiff(year, m.createdAt, now()) > 0
+                                then concat(timestampdiff(year, m.createdAt, now()), '년 전')
+                            when timestampdiff(month, m.pulledUpAt, now()) > 0 and m.pulledUpCount > 0
+                                then concat('끌올 ', timestampdiff(month, m.pulledUpAt, now()), '달 전')
+                            when timestampdiff(month, m.createdAt, now()) > 0
+                                then concat(timestampdiff(month, m.createdAt, now()), '달 전')
+                            when timestampdiff(day, m.pulledUpAt, now()) > 0 and m.pulledUpCount > 0
+                                then concat('끌올 ', timestampdiff(day, m.pulledUpAt, now()), '일 전')
+                            when timestampdiff(day, m.createdAt, now()) > 0
+                                then concat(timestampdiff(day, m.createdAt, now()), '일 전')
+                            when hour(timediff(m.pulledUpAt, now())) > 0 and m.pulledUpCount > 0
+                                then concat('끌올 ', hour(timediff(m.pulledUpAt, now())), '시간 전')
+                            when hour(timediff(m.createdAt, now())) > 0
+                                then concat(hour(timediff(m.createdAt, now())), '년 전')
+                            when minute(timediff(m.pulledUpAt, now())) > 0 and m.pulledUpCount > 0
+                                then concat('끌올 ', minute(timediff(m.pulledUpAt, now())), '분 전')
+                            when minute(timediff(m.createdAt, now())) > 0
+                                then concat(minute(timediff(m.createdAt, now())), '년 전')
+                            when second(timediff(m.pulledUpAt, now())) > 0 and m.pulledUpCount > 0
+                                then concat('끌올 ', second(timediff(m.pulledUpAt, now())), '초 전')
+                            when second(timediff(m.createdAt, now())) > 0
+                                then concat(second(timediff(m.createdAt, now())), '년 전')
+                        end as createdAt
+                from User u
+                left join Merchandise m on m.userId = u.id
+                left join MerchandiseImage mi on m.id = mi.merchandiseId
+                left join Location l on u.locationId = l.id
+                left join ChatRoom cr on cr.merchandiseId = m.id
+                left join (select ml.id, count(ml.id) as likeCount
+                        from MerchandiseLike ml
+                        where ml.isDeleted = 1
+                        group by ml.merchandiseId) as lc on m.id = lc.id
+                where (mi.number = 1 or mi.number is null)
+                and m.isDeleted = 1
+                and m.isHided = 0
+                and m.userId = ?
+                group by m.id
+                order by coalesce(m.pulledUpAt, m.createdAt) desc;
+                `;
+
+  const row = await connection.query(query, userId);
+
+  return row[0];
+}
+
 module.exports = {
   checkLocationExist,
   selectAllMerchandise,
@@ -518,4 +611,8 @@ module.exports = {
   checkHost,
   selectMyMerchandise,
   updateMerchandise,
+  checkAlreadyHideOnOFF,
+  updateMerchandiseHideOn,
+  updateMerchandiseHideOff,
+  selectMyHideMerchandise,
 };

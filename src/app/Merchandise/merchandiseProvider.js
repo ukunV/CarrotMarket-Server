@@ -193,7 +193,7 @@ exports.checkPullUpPossible = async function (merchandiseId) {
   }
 };
 
-// 내 판매상품 조회 API (status - 판매중/예약중 : 1, 거래완료 : 0)
+// 내 판매상품 조회 (status - 판매중/예약중 : 1, 거래완료 : 0)
 exports.getMyMerchandise = async function (userId, condition) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
@@ -209,6 +209,44 @@ exports.getMyMerchandise = async function (userId, condition) {
     return result;
   } catch (err) {
     logger.error(`getMyMerchandise Provider error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 상품 숨기기 여부 check
+exports.checkAlreadyHideOnOFF = async function (merchandiseId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await merchandiseDao.checkAlreadyHideOnOFF(
+      connection,
+      merchandiseId
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`checkAlreadyHideOnOFF Provider error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 숨긴 판매상품 조회
+exports.getMyHideMerchandise = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await merchandiseDao.selectMyHideMerchandise(
+      connection,
+      userId
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`getMyHideMerchandise Provider error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };

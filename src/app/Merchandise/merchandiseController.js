@@ -182,11 +182,6 @@ exports.deleteMerchandise = async function (req, res) {
   const { merchandiseId } = req.params;
 
   // Request Error
-  const checkHost = await merchandiseProvider.checkHost(userId, merchandiseId);
-
-  if (checkHost === "false")
-    return res.send(errResponse(baseResponse.USERID_IS_NOT_HOST)); // 2015
-
   if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
 
   if (userId !== bodyId)
@@ -204,6 +199,11 @@ exports.deleteMerchandise = async function (req, res) {
 
   if (checkMerchandiseIsDeleted === 0)
     return res.send(errResponse(baseResponse.MERCHANDISE_IS_DELETED)); // 2011
+
+  const checkHost = await merchandiseProvider.checkHost(userId, merchandiseId);
+
+  if (checkHost === "false")
+    return res.send(errResponse(baseResponse.USERID_IS_NOT_HOST)); // 2015
 
   const result = await merchandiseService.deleteMerchandise(merchandiseId);
 
@@ -225,11 +225,6 @@ exports.pullUpMerchandise = async function (req, res) {
   const { price } = req.body;
 
   // Request Error
-  const checkHost = await merchandiseProvider.checkHost(userId, merchandiseId);
-
-  if (checkHost === "false")
-    return res.send(errResponse(baseResponse.USERID_IS_NOT_HOST)); // 2015
-
   if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
 
   if (userId !== bodyId)
@@ -247,6 +242,11 @@ exports.pullUpMerchandise = async function (req, res) {
 
   if (checkMerchandiseIsDeleted === 0)
     return res.send(errResponse(baseResponse.MERCHANDISE_IS_DELETED)); // 2011
+
+  const checkHost = await merchandiseProvider.checkHost(userId, merchandiseId);
+
+  if (checkHost === "false")
+    return res.send(errResponse(baseResponse.USERID_IS_NOT_HOST)); // 2015
 
   const checkPullUpPossible = await merchandiseProvider.checkPullUpPossible(
     merchandiseId
@@ -288,11 +288,6 @@ exports.updateMerchandiseStatus = async function (req, res) {
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
 
-  const checkHost = await merchandiseProvider.checkHost(userId, merchandiseId);
-
-  if (checkHost === "false")
-    return res.send(errResponse(baseResponse.USERID_IS_NOT_HOST)); // 2015
-
   const checkMerchandiseExist = await merchandiseProvider.checkMerchandiseExist(
     merchandiseId
   );
@@ -305,6 +300,11 @@ exports.updateMerchandiseStatus = async function (req, res) {
 
   if (checkMerchandiseIsDeleted === 0)
     return res.send(errResponse(baseResponse.MERCHANDISE_IS_DELETED)); // 2011
+
+  const checkHost = await merchandiseProvider.checkHost(userId, merchandiseId);
+
+  if (checkHost === "false")
+    return res.send(errResponse(baseResponse.USERID_IS_NOT_HOST)); // 2015
 
   if (!(status in [1, 2, 3]))
     return res.send(errResponse(baseResponse.STATUS_IS_NOT_VALID)); // 2021
@@ -346,7 +346,7 @@ exports.getMyMerchandise = async function (req, res) {
       condition += "and m.status in (1, 2)";
       break;
   }
-  console.log(condition);
+
   const result = await merchandiseProvider.getMyMerchandise(userId, condition);
 
   return res.send(response(baseResponse.SUCCESS, result));
@@ -366,15 +366,15 @@ exports.updateMerchandise = async function (req, res) {
   const { image_arr, categoryId, title, contents, price } = req.body;
 
   // Request Error
-  const checkHost = await merchandiseProvider.checkHost(userId, merchandiseId);
-
-  if (checkHost === "false")
-    return res.send(errResponse(baseResponse.USERID_IS_NOT_HOST)); // 2015
-
   if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
 
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkHost = await merchandiseProvider.checkHost(userId, merchandiseId);
+
+  if (checkHost === "false")
+    return res.send(errResponse(baseResponse.USERID_IS_NOT_HOST)); // 2015
 
   const checkCategoryExist = await merchandiseProvider.checkCategoryExist(
     categoryId
@@ -391,6 +391,126 @@ exports.updateMerchandise = async function (req, res) {
     price,
     image_arr
   );
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 26
+ * API Name : 판매상품 숨기기 API
+ * [PATCH] /merchandise/:merchandiseId/hide-on
+ * Path Variable: merchandiseId
+ */
+exports.updateMerchandiseHideOn = async function (req, res) {
+  const { userId } = req.verifiedToken;
+  const { bodyId } = req.body;
+
+  const { merchandiseId } = req.params;
+
+  // Request Error
+  if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
+
+  if (userId !== bodyId)
+    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkMerchandiseExist = await merchandiseProvider.checkMerchandiseExist(
+    merchandiseId
+  );
+
+  if (checkMerchandiseExist === 0)
+    return res.send(errResponse(baseResponse.MERCHANDISE_IS_NOT_EXIST)); // 2010
+
+  const checkMerchandiseIsDeleted =
+    await merchandiseProvider.checkMerchandiseIsDeleted(merchandiseId);
+
+  if (checkMerchandiseIsDeleted === 0)
+    return res.send(errResponse(baseResponse.MERCHANDISE_IS_DELETED)); // 2011
+
+  const checkHost = await merchandiseProvider.checkHost(userId, merchandiseId);
+
+  if (checkHost === "false")
+    return res.send(errResponse(baseResponse.USERID_IS_NOT_HOST)); // 2015
+
+  const checkAlreadyHideOnOFF = await merchandiseProvider.checkAlreadyHideOnOFF(
+    merchandiseId
+  );
+
+  if (checkAlreadyHideOnOFF === 0)
+    return res.send(errResponse(baseResponse.MERCHANDISE_ALREADY_HIDE_ON)); // 2023
+
+  const result = await merchandiseService.updateMerchandiseHideOn(
+    merchandiseId
+  );
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 27
+ * API Name : 판매상품 숨기기 해제 API
+ * [PATCH] /merchandise/:merchandiseId/hide-off
+ * Path Variable: merchandiseId
+ */
+exports.updateMerchandiseHideOff = async function (req, res) {
+  const { userId } = req.verifiedToken;
+  const { bodyId } = req.body;
+
+  const { merchandiseId } = req.params;
+
+  // Request Error
+  if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
+
+  if (userId !== bodyId)
+    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkMerchandiseExist = await merchandiseProvider.checkMerchandiseExist(
+    merchandiseId
+  );
+
+  if (checkMerchandiseExist === 0)
+    return res.send(errResponse(baseResponse.MERCHANDISE_IS_NOT_EXIST)); // 2010
+
+  const checkMerchandiseIsDeleted =
+    await merchandiseProvider.checkMerchandiseIsDeleted(merchandiseId);
+
+  if (checkMerchandiseIsDeleted === 0)
+    return res.send(errResponse(baseResponse.MERCHANDISE_IS_DELETED)); // 2011
+
+  const checkHost = await merchandiseProvider.checkHost(userId, merchandiseId);
+
+  if (checkHost === "false")
+    return res.send(errResponse(baseResponse.USERID_IS_NOT_HOST)); // 2015
+
+  const checkAlreadyHideOnOFF = await merchandiseProvider.checkAlreadyHideOnOFF(
+    merchandiseId
+  );
+
+  if (checkAlreadyHideOnOFF === 1)
+    return res.send(errResponse(baseResponse.MERCHANDISE_ALREADY_HIDE_OFF)); // 2024
+
+  const result = await merchandiseService.updateMerchandiseHideOff(
+    merchandiseId
+  );
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 28
+ * API Name : 숨긴 판매상품 조회 API
+ * [GET] /merchandise/hide/my-merchandise
+ */
+exports.getMyHideMerchandise = async function (req, res) {
+  const { userId } = req.verifiedToken;
+  const { bodyId } = req.body;
+
+  // Request Error
+  if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
+
+  if (userId !== bodyId)
+    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const result = await merchandiseProvider.getMyHideMerchandise(userId);
 
   return res.send(response(baseResponse.SUCCESS, result));
 };

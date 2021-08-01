@@ -158,3 +158,51 @@ exports.updateMerchandise = async function (
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 판매상품 숨기기
+exports.updateMerchandiseHideOn = async function (merchandiseId) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  try {
+    await connection.beginTransaction();
+
+    const result = await merchandiseDao.updateMerchandiseHideOn(
+      connection,
+      merchandiseId
+    );
+
+    await connection.commit();
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(`updateMerchandiseHideOn Service error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 판매상품 숨기기 해제
+exports.updateMerchandiseHideOff = async function (merchandiseId) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  try {
+    await connection.beginTransaction();
+
+    const result = await merchandiseDao.updateMerchandiseHideOff(
+      connection,
+      merchandiseId
+    );
+
+    await connection.commit();
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(`updateMerchandiseHideOff Service error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
