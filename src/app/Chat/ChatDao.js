@@ -3,6 +3,12 @@ async function selectChatRoomList(connection, userId) {
   const query = `
                 select u.photoURL, u.nickname, cm.contents, mi.imageURL,
                       case
+                          when userOneId = uu.id
+                              then userOneIsDeleted
+                          when userTwoId = uu.id
+                              then userTwoIsDeleted
+                      end as isDeleted,
+                      case
                           when datediff(now(), cr.updatedAt) > 364
                               then concat(DATE_FORMAT(cr.updatedAt, '%y'), '년 ',DATE_FORMAT(cr.updatedAt, '%m'), '월 ', DATE_FORMAT(cr.updatedAt, '%d'), '일')
                           when datediff(now(), cr.updatedAt) > 0
@@ -38,7 +44,16 @@ async function selectChatRoomList(connection, userId) {
 
   const row = await connection.query(query, [userId, userId, userId, userId]);
 
-  return row[0];
+  console.log(row[0].length);
+
+  let result = [];
+
+  // 채팅방을 조회하는 유저가 해당 채팅방을 삭제했는지 확인
+  for (let i = 0; i < row[0].length; i++) {
+    if (row[0][i]["isDeleted"] === 1) result.push(row[0][i]);
+  }
+
+  return result;
 }
 
 // 채팅방 존재 여부 check
