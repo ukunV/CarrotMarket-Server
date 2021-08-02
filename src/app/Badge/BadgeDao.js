@@ -37,12 +37,13 @@ async function checkBadgeExist(connection, badgeId) {
 // 배지 상세내용 조회
 async function getBadgeDetail(connection, badgeId) {
   const query = `
-                select badgeName, badgeImageURL, badgeDescription
+                select badgeName, badgeImageURL, badgeDescription,
+                      concat(round(((select count(*) from BadgeAcheived where badgeId = ?) / (select count(*) from User)), 2), '% 사용자가 획득했어요') as acheiveRate
                 from Badge
                 where id = ?;
                 `;
 
-  const row = await connection.query(query, badgeId);
+  const row = await connection.query(query, [badgeId, badgeId]);
 
   return row[0];
 }
