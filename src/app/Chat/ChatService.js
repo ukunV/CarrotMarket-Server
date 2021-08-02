@@ -38,3 +38,24 @@ exports.createChat = async function (roomId, userId, contents) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 채팅방 삭제
+exports.deleteChatRoom = async function (roomId, userId) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  try {
+    await connection.beginTransaction();
+
+    const result = await chatDao.deleteChatRoom(connection, roomId, userId);
+
+    await connection.commit();
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(`deleteChatRoom Service error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

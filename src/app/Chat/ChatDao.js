@@ -80,9 +80,13 @@ async function createChat(connection, roomId, userId, contents) {
                 update ChatRoom
                 set updatedAt = (select createdAt
                                 from ChatMessage
-                                where id = (select max(id) from ChatMessage))
+                                where id = (select max(id) from ChatMessage)),
+                    userOneIsDeleted = 1,
+                    userTwoIsDeleted = 1
                 where id = ?
                 `;
+  // userOneIsDeleted = 1, userTwoIsDeleted = 1
+  // -> 삭제한 채팅방을 새로운 채팅으로 인해 재 생성
 
   await connection.query(query2, roomId);
 
@@ -139,10 +143,46 @@ async function selectChatRoom(connection, roomId) {
   return row[0];
 }
 
+// 채팅방 삭제
+async function deleteChatRoom(connection, roomId, userId) {
+  const query1 = `
+                  select userOneId, userTwoId
+                  from ChatRoom
+                  where id = ?;
+                  `;
+
+  const row1 = await connection.query(query1, roomId);
+
+  let result = [];
+
+  if (row1[0][0]["userOneId"] === userId) {
+    const query2 = `
+                  update ChatRoom
+                  set userOneIsDeleted = 0
+                  where id = ?
+                  `;
+
+    const row2 = await connection.query(query2, roomId);
+    result = row2[0].info;
+  } else {
+    const query2 = `
+                  update ChatRoom
+                  set userTwoIsDeleted = 0
+                  where id = ?
+                  `;
+
+    const row2 = await connection.query(query2, roomId);
+    result = row2[0].info;
+  }
+
+  return result;
+}
+
 module.exports = {
   selectChatRoomList,
   checkRoomExist,
   createChat,
   checkRoomMember,
   selectChatRoom,
+  deleteChatRoom,
 };

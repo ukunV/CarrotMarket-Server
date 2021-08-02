@@ -10,4 +10,7 @@ module.exports = function (app) {
 
   // 25. 채팅방 조회 API
   app.get("/chat/:roomId/room", jwtMiddleware, chat.getChatRoom);
+
+  // 29. 채팅방 조회 API
+  app.patch("/chat/:roomId/room/status", jwtMiddleware, chat.deleteChatRoom);
 };

@@ -87,3 +87,35 @@ exports.getChatRoom = async function (req, res) {
 
   return res.send(response(baseResponse.SUCCESS, result));
 };
+
+/**
+ * API No. 29
+ * API Name : 채팅방 삭제 API
+ * [PATCH] /chat/:roomId/room/status
+ */
+exports.deleteChatRoom = async function (req, res) {
+  const { userId } = req.verifiedToken;
+  const { bodyId } = req.body;
+
+  const { roomId } = req.params;
+
+  // Request Error
+  if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
+
+  if (userId !== bodyId)
+    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkRoomExist = await chatProvider.checkRoomExist(roomId);
+
+  if (checkRoomExist === 0)
+    return res.send(errResponse(baseResponse.CHATROOM_IS_NOT_EXIST)); // 2022
+
+  const checkRoomMember = await chatProvider.checkRoomMember(roomId, userId);
+
+  if (checkRoomMember === 0)
+    return res.send(errResponse(baseResponse.NOT_IN_ROOM_MEMBER)); // 2023
+
+  const result = await chatService.deleteChatRoom(roomId, userId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
