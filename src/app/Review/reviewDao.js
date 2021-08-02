@@ -22,7 +22,7 @@ async function selectReview(connection, selectedId) {
                       left join Location l on u.locationId = l.id
                 where r.userId = ?
                 and r.isDeleted = 1
-                order by createdAt;
+                order by r.createdAt;
                 `;
 
   const row = await connection.query(query, selectedId);
