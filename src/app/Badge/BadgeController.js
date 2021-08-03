@@ -7,6 +7,9 @@ const { response, errResponse } = require("../../../config/response");
 const regexEmail = require("regex-email");
 const { emit } = require("nodemon");
 
+// Regex
+const regNum = /^[0-9]/g;
+
 /**
  * API No. 20
  * API Name : 획득 배지 조회 API
@@ -29,6 +32,9 @@ exports.getBadge = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
+
+  if (!regNum.test(selectedId) || selectedId < 1)
+    return res.send(errResponse(baseResponse.SELECT_ID_FORM_IS_NOT_CORRECT)); // 2031
 
   const checkSelectedIdExist = await badgeProvider.checkUserExist(selectedId);
 
@@ -63,6 +69,9 @@ exports.getBadgeDetail = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
 
+  if (!regNum.test(badgeId) || badgeId < 1)
+    return res.send(errResponse(baseResponse.BADGE_ID_FORM_IS_NOT_CORRECT)); // 2036
+
   const checkBadgeExist = await badgeProvider.checkBadgeExist(badgeId);
 
   if (checkBadgeExist === 0)
@@ -95,6 +104,9 @@ exports.updateMainBadge = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
+
+  if (!regNum.test(badgeId) || badgeId < 1)
+    return res.send(errResponse(baseResponse.BADGE_ID_FORM_IS_NOT_CORRECT)); // 2036
 
   const checkBadgeExist = await badgeProvider.checkBadgeExist(badgeId);
 

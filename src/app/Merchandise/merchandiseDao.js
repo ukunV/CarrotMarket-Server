@@ -10,7 +10,7 @@ async function checkLocationExist(connection, locationId) {
 }
 
 // 동네별 최신순 판매 상품 조회
-async function selectAllMerchandise(connection, locationId) {
+async function selectAllMerchandise(connection, locationId, page, size) {
   const query = `
                 select m.title, mi.imageURL, l.address3 as address, m.price, ifnull(lc.likeCount, 0) as likeCount,
                         case
@@ -55,10 +55,11 @@ async function selectAllMerchandise(connection, locationId) {
                 and m.isHided = 1
                 and m.isDeleted = 1
                 and (mi.rn = 1 or mi.rn is null)
-                order by coalesce(m.pulledUpAt, m.createdAt) desc;
+                order by coalesce(m.pulledUpAt, m.createdAt) desc
+                limit ?, ?;
                 `;
 
-  const row = await connection.query(query, locationId);
+  const row = await connection.query(query, [locationId, page, size]);
 
   return row[0];
 }
@@ -244,7 +245,8 @@ async function selectCategoryMerchandise(connection, params) {
                    and m.isHided = 1
                    and m.isDeleted = 1
                    and (mi.rn = 1 or mi.rn is null)
-                   order by coalesce(m.pulledUpAt, m.createdAt) desc;
+                   order by coalesce(m.pulledUpAt, m.createdAt) desc
+                   limit ?, ?;
                    `;
 
   const row = await connection.query(query, params);
@@ -544,7 +546,7 @@ async function updateMerchandiseHideOff(connection, merchandiseId) {
 }
 
 // 숨긴 판매상품 조회
-async function selectMyHideMerchandise(connection, userId) {
+async function selectMyHideMerchandise(connection, userId, page, size) {
   const query = `
                 select mi.imageURL, m.title, m.price, l.address3 as address, m.status, m.isHided,
                         ifnull(lc.likeCount, 0) as likeCount, m.pulledUpCount,
@@ -589,10 +591,11 @@ async function selectMyHideMerchandise(connection, userId) {
                 and m.isHided = 0
                 and m.userId = ?
                 group by m.id
-                order by coalesce(m.pulledUpAt, m.createdAt) desc;
+                order by coalesce(m.pulledUpAt, m.createdAt) desc
+                limit ?, ?;
                 `;
 
-  const row = await connection.query(query, userId);
+  const row = await connection.query(query, [userId, page, size]);
 
   return row[0];
 }

@@ -26,12 +26,14 @@ exports.checkLocationExist = async function (locationId) {
 };
 
 // 동네별 최신수 판매 상품 조회
-exports.getAllMerchandise = async function (locationId) {
+exports.getAllMerchandise = async function (locationId, page, size) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
     const result = await merchandiseDao.selectAllMerchandise(
       connection,
-      locationId
+      locationId,
+      page,
+      size
     );
 
     connection.release();
@@ -155,11 +157,16 @@ exports.checkCategoryExist = async function (categoryId) {
 };
 
 // 카테고리별 최신순 판매상품 조회
-exports.getCategoryMerchandise = async function (locationId, categoryId) {
+exports.getCategoryMerchandise = async function (
+  locationId,
+  categoryId,
+  page,
+  size
+) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    const params = [locationId, categoryId];
+    const params = [locationId, categoryId, page, size];
     const result = await merchandiseDao.selectCategoryMerchandise(
       connection,
       params
@@ -230,13 +237,15 @@ exports.checkIsHided = async function (merchandiseId) {
 };
 
 // 숨긴 판매상품 조회
-exports.getMyHideMerchandise = async function (userId) {
+exports.getMyHideMerchandise = async function (userId, page, size) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
     const result = await merchandiseDao.selectMyHideMerchandise(
       connection,
-      userId
+      userId,
+      page,
+      size
     );
 
     connection.release();

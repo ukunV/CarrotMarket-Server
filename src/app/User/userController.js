@@ -13,6 +13,10 @@ const { emit } = require("nodemon");
 const { NCPClient } = require("../../../config/ncp_client");
 const sensKey = require("../../../config/ncp_config").sensSecret;
 
+// Regex
+const regPhoneNum = /^\d{3}\d{3,4}\d{4}$/;
+const regNum = /^[0-9]/g;
+
 // 랜덤 닉네임 생성 함수
 function createNickname(numeric, alphabet) {
   let randomStr = "";
@@ -34,9 +38,6 @@ function createAuthNum() {
 
   return randNum;
 }
-
-// Regex
-const regPhoneNum = /^\d{3}\d{3,4}\d{4}$/;
 
 /**
  * API No. 1
@@ -76,6 +77,9 @@ exports.createUser = async function (req, res) {
     return res.send(errResponse(baseResponse.SIGNUP_PHONENUM_ERROR_TYPE)); // 2002
 
   if (!bodyAuth) return res.send(errResponse(baseResponse.SIGNUP_AUTH_EMPTY)); // 2003
+
+  if (!regNum.test(bodyAuth))
+    return res.send(errResponse(baseResponse.AUTH_NUM_FORM_IS_NOT_CORRECT)); // 2037
 
   if (bodyAuth !== sendAuth)
     return res.send(errResponse(baseResponse.SIGNUP_AUTH_NOT_MATCH)); // 2004
@@ -177,6 +181,7 @@ exports.getMyCarrot = async function (req, res) {
 exports.getUserProfile = async function (req, res) {
   const { userId } = req.verifiedToken;
   const { bodyId } = req.body;
+
   const { selectedId } = req.params;
 
   // Request Error
@@ -189,6 +194,9 @@ exports.getUserProfile = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
+
+  if (!regNum.test(selectedId) || selectedId < 1)
+    return res.send(errResponse(baseResponse.SELECT_ID_FORM_IS_NOT_CORRECT)); // 2031
 
   const checkSelectedIdExist = await userProvider.checkUserExist(selectedId);
 

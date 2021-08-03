@@ -7,6 +7,9 @@ const { response, errResponse } = require("../../../config/response");
 const regexEmail = require("regex-email");
 const { emit } = require("nodemon");
 
+// Regex
+const regNum = /^[0-9]/g;
+
 /**
  * API No. 23
  * API Name : 채팅방 목록 조회 API
@@ -55,6 +58,9 @@ exports.createChat = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
 
+  if (!regNum.test(roomId) || roomId < 1)
+    return res.send(errResponse(baseResponse.ROOM_ID_FORM_IS_NOT_CORRECT)); // 2035
+
   const checkRoomExist = await chatProvider.checkRoomExist(roomId);
 
   if (checkRoomExist === 0)
@@ -86,6 +92,9 @@ exports.getChatRoom = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
+
+  if (!regNum.test(roomId) || roomId < 1)
+    return res.send(errResponse(baseResponse.ROOM_ID_FORM_IS_NOT_CORRECT)); // 2035
 
   const checkRoomExist = await chatProvider.checkRoomExist(roomId);
 
@@ -123,6 +132,9 @@ exports.deleteChatRoom = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
+
+  if (!regNum.test(roomId) || roomId < 1)
+    return res.send(errResponse(baseResponse.ROOM_ID_FORM_IS_NOT_CORRECT)); // 2035
 
   const checkRoomExist = await chatProvider.checkRoomExist(roomId);
 

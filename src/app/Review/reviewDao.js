@@ -1,5 +1,5 @@
 // 후기 조회
-async function selectReview(connection, selectedId) {
+async function selectReview(connection, selectedId, page, size) {
   const query = `
                 select u.nickname, u.photoURL, r.contents,
                       concat(l.address1, ' ', l.address2, ' ', l.address3) as address,
@@ -22,10 +22,11 @@ async function selectReview(connection, selectedId) {
                       left join Location l on u.locationId = l.id
                 where r.userId = ?
                 and r.isDeleted = 1
-                order by r.createdAt;
+                order by r.createdAt
+                limit ?, ?;
                 `;
 
-  const row = await connection.query(query, selectedId);
+  const row = await connection.query(query, [selectedId, page, size]);
 
   return row[0];
 }

@@ -123,7 +123,7 @@ module.exports = {
   STATUS_IS_NOT_VALID: {
     isSuccess: false,
     code: 2021,
-    message: "변경을 원하는 상태를 확인하세요.",
+    message: "status가 올바르지 않습니다.",
   },
   CHATROOM_IS_NOT_EXIST: {
     isSuccess: false,
@@ -149,6 +149,71 @@ module.exports = {
     isSuccess: false,
     code: 2026,
     message: "해당 유저는 존재하지 않습니다.",
+  },
+  PAGE_IS_EMPTY: {
+    isSuccess: false,
+    code: 2027,
+    message: "page를 입력해주세요.",
+  },
+  PAGE_FORM_IS_NOT_CORRECT: {
+    isSuccess: false,
+    code: 2028,
+    message: "page 형식이 올바르지 않습니다.",
+  },
+  SIZE_IS_EMPTY: {
+    isSuccess: false,
+    code: 2029,
+    message: "size를 입력해주세요.",
+  },
+  SIZE_FORM_IS_NOT_CORRECT: {
+    isSuccess: false,
+    code: 2030,
+    message: "size 형식이 올바르지 않습니다.",
+  },
+  SELECT_ID_FORM_IS_NOT_CORRECT: {
+    isSuccess: false,
+    code: 2031,
+    message: "selectedId 형식이 올바르지 않습니다.",
+  },
+  MERCHANDISE_ID_FORM_IS_NOT_CORRECT: {
+    isSuccess: false,
+    code: 2032,
+    message: "merchandiseId 형식이 올바르지 않습니다.",
+  },
+  LOCATION_ID_FORM_IS_NOT_CORRECT: {
+    isSuccess: false,
+    code: 2033,
+    message: "locationId 형식이 올바르지 않습니다.",
+  },
+  CATEGORY_ID_FORM_IS_NOT_CORRECT: {
+    isSuccess: false,
+    code: 2034,
+    message: "categoryId 형식이 올바르지 않습니다.",
+  },
+  ROOM_ID_FORM_IS_NOT_CORRECT: {
+    isSuccess: false,
+    code: 2035,
+    message: "roomId 형식이 올바르지 않습니다.",
+  },
+  BADGE_ID_FORM_IS_NOT_CORRECT: {
+    isSuccess: false,
+    code: 2036,
+    message: "badgeId 형식이 올바르지 않습니다.",
+  },
+  AUTH_NUM_FORM_IS_NOT_CORRECT: {
+    isSuccess: false,
+    code: 2037,
+    message: "인증번호 형식이 올바르지 않습니다.",
+  },
+  AUTHOR_ID_FORM_IS_NOT_CORRECT: {
+    isSuccess: false,
+    code: 2038,
+    message: "authorId 형식이 올바르지 않습니다.",
+  },
+  REVIEW_ID_FORM_IS_NOT_CORRECT: {
+    isSuccess: false,
+    code: 2039,
+    message: "reviewId 형식이 올바르지 않습니다.",
   },
 
   // Response error

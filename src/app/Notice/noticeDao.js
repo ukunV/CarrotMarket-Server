@@ -1,5 +1,5 @@
 // 후기 상태 변경
-async function selectNotice(connection, userId) {
+async function selectNotice(connection, userId, page, size) {
   const query = `
                 select title, contents,
                       case
@@ -27,10 +27,11 @@ async function selectNotice(connection, userId) {
                 or locationId = (select locationId from User where id = ?)
                 or userId = ?
                 and isDeleted = 1
-                order by createdAt desc;
+                order by createdAt desc
+                limit ?, ?;
                 `;
 
-  const row = await connection.query(query, [userId, userId]);
+  const row = await connection.query(query, [userId, userId, page, size]);
 
   return row[0];
 }
