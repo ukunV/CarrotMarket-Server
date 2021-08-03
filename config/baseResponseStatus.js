@@ -50,10 +50,10 @@ module.exports = {
     code: 2006,
     message: "userId가 적절하지 않습니다.",
   },
-  USER_IS_NOT_EXIST: {
+  SELECTED_USER_IS_NOT_EXIST: {
     isSuccess: false,
     code: 2007,
-    message: "존재하지 않는 유저입니다.",
+    message: "조회하려는 유저는 존재하지 않는 유저입니다.",
   },
   USER_STATUS_IS_NOT_VALID: {
     isSuccess: false,
@@ -144,6 +144,11 @@ module.exports = {
     isSuccess: false,
     code: 2025,
     message: "해당 상품은 이미 숨기기 상태가 아닙니다.",
+  },
+  USER_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 2026,
+    message: "해당 유저는 존재하지 않습니다.",
   },
 
   // Response error

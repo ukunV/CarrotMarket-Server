@@ -24,6 +24,11 @@ exports.getReview = async function (req, res) {
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
 
+  const checkUserExist = reviewProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
+
   const result = await reviewProvider.getReview(selectedId);
 
   return res.send(response(baseResponse.SUCCESS, result));
@@ -45,6 +50,11 @@ exports.createReview = async function (req, res) {
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
 
+  const checkUserExist = reviewProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
+
   const result = await reviewService.createReview(userId, authorId, contents);
 
   return res.send(response(baseResponse.SUCCESS, result));
@@ -64,6 +74,11 @@ exports.updateReviewStatus = async function (req, res) {
 
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkUserExist = reviewProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
 
   const result = await reviewService.updateReviewStatus(reviewId);
 

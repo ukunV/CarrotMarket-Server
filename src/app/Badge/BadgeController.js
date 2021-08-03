@@ -25,10 +25,15 @@ exports.getBadge = async function (req, res) {
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
 
-  const checkUserExist = await badgeProvider.checkUserExist(selectedId);
+  const checkUserExist = badgeProvider.checkUserExist(userId);
 
   if (checkUserExist === 0)
-    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2007
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
+
+  const checkSelectedIdExist = await badgeProvider.checkUserExist(selectedId);
+
+  if (checkSelectedIdExist === 0)
+    return res.send(errResponse(baseResponse.SELECTED_USER_IS_NOT_EXIST)); // 2007
 
   const result = await badgeProvider.getBadge(selectedId);
 
@@ -52,6 +57,11 @@ exports.getBadgeDetail = async function (req, res) {
 
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkUserExist = badgeProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
 
   const checkBadgeExist = await badgeProvider.checkBadgeExist(badgeId);
 
@@ -80,6 +90,11 @@ exports.updateMainBadge = async function (req, res) {
 
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkUserExist = badgeProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
 
   const checkBadgeExist = await badgeProvider.checkBadgeExist(badgeId);
 

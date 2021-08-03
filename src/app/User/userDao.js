@@ -147,12 +147,12 @@ async function selectUserProfile(connection, selectedId) {
 }
 
 // 유저 존재 여부 check
-async function checkExist(connection, selectedId) {
+async function checkUserExist(connection, id) {
   const query = `
         select exists(select id from User where id = ?) as exist;
                 `;
 
-  const row = await connection.query(query, selectedId);
+  const row = await connection.query(query, id);
 
   return row[0][0]["exist"];
 }
@@ -178,6 +178,6 @@ module.exports = {
   updateUserProfile,
   selectMyCarrot,
   selectUserProfile,
-  checkExist,
+  checkUserExist,
   checkStatus,
 };

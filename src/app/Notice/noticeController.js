@@ -22,6 +22,11 @@ exports.getNotice = async function (req, res) {
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
 
+  const checkUserExist = noticeProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
+
   const result = await noticeProvider.getNotice(userId);
 
   return res.send(response(baseResponse.SUCCESS, result));

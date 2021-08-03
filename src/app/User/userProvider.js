@@ -67,17 +67,17 @@ exports.getUserProfile = async function (selectedId) {
 };
 
 // 유저 존재 여부 check
-exports.checkExist = async function (selectedId) {
+exports.checkUserExist = async function (id) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await userDao.checkExist(connection, selectedId);
+    const result = await userDao.checkUserExist(connection, id);
 
     connection.release();
 
     return result;
   } catch (err) {
-    logger.error(`checkExist Provider error\n: ${err.message}`);
+    logger.error(`checkUserExist Provider error\n: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };

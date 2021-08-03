@@ -69,3 +69,19 @@ exports.getChatRoom = async function (roomId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 유저 존재 여부 check
+exports.checkUserExist = async function (id) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await chatDao.checkUserExist(connection, id);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`checkUserExist Provider error\n: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

@@ -11,7 +11,6 @@ const { emit } = require("nodemon");
  * API No. 23
  * API Name : 채팅방 목록 조회 API
  * [GET] /chat/room/list
- * 채팅방(유저 마다) 삭제 여부 체크
  */
 exports.getChatRoomList = async function (req, res) {
   const { userId } = req.verifiedToken;
@@ -22,6 +21,11 @@ exports.getChatRoomList = async function (req, res) {
 
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkUserExist = chatProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
 
   const result = await chatProvider.getChatRoomList(userId);
 
@@ -45,6 +49,11 @@ exports.createChat = async function (req, res) {
 
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkUserExist = chatProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
 
   const checkRoomExist = await chatProvider.checkRoomExist(roomId);
 
@@ -72,6 +81,11 @@ exports.getChatRoom = async function (req, res) {
 
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkUserExist = chatProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
 
   const checkRoomExist = await chatProvider.checkRoomExist(roomId);
 
@@ -104,6 +118,11 @@ exports.deleteChatRoom = async function (req, res) {
 
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkUserExist = chatProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
 
   const checkRoomExist = await chatProvider.checkRoomExist(roomId);
 

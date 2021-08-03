@@ -597,6 +597,17 @@ async function selectMyHideMerchandise(connection, userId) {
   return row[0];
 }
 
+// 유저 존재 여부 check
+async function checkUserExist(connection, id) {
+  const query = `
+        select exists(select id from User where id = ?) as exist;
+                `;
+
+  const row = await connection.query(query, id);
+
+  return row[0][0]["exist"];
+}
+
 module.exports = {
   checkLocationExist,
   selectAllMerchandise,
@@ -618,4 +629,5 @@ module.exports = {
   updateMerchandiseHideOn,
   updateMerchandiseHideOff,
   selectMyHideMerchandise,
+  checkUserExist,
 };

@@ -44,7 +44,7 @@ const regPhoneNum = /^\d{3}\d{3,4}\d{4}$/;
  * [POST] /user/login
  */
 exports.createUser = async function (req, res) {
-  const { userPhoneNum, bodyAuth } = req.body;
+  const { userPhoneNum } = req.body;
 
   const sendAuth = createAuthNum();
 
@@ -158,6 +158,11 @@ exports.getMyCarrot = async function (req, res) {
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
 
+  const checkUserExist = userProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
+
   const result = await userProvider.getMyCarrot(userId);
 
   return res.send(response(baseResponse.SUCCESS, result));
@@ -180,10 +185,15 @@ exports.getUserProfile = async function (req, res) {
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
 
-  const checkExist = await userProvider.checkExist(selectedId);
+  const checkUserExist = userProvider.checkUserExist(userId);
 
-  if (checkExist === 0)
-    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2007
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
+
+  const checkSelectedIdExist = await userProvider.checkUserExist(selectedId);
+
+  if (checkSelectedIdExist === 0)
+    return res.send(errResponse(baseResponse.SELECTED_USER_IS_NOT_EXIST)); // 2007
 
   const checkStatus = await userProvider.checkStatus(selectedId);
 
@@ -209,6 +219,11 @@ exports.updateUserProfile = async function (req, res) {
 
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkUserExist = userProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
 
   // Response Error
   const checkUserNickname = await userProvider.nicknameCheck(nickname);

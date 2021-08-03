@@ -23,11 +23,11 @@ exports.getBadge = async function (selectedId) {
 };
 
 // 유저 존재 여부 check
-exports.checkUserExist = async function (selectedId) {
+exports.checkUserExist = async function (id) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await badgeDao.checkUserExist(connection, selectedId);
+    const result = await badgeDao.checkUserExist(connection, id);
 
     connection.release();
 

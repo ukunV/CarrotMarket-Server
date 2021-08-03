@@ -55,8 +55,20 @@ async function updateReviewStatus(connection, reviewId) {
   return row[0]["info"];
 }
 
+// 유저 존재 여부 check
+async function checkUserExist(connection, id) {
+  const query = `
+        select exists(select id from User where id = ?) as exist;
+                `;
+
+  const row = await connection.query(query, id);
+
+  return row[0][0]["exist"];
+}
+
 module.exports = {
   selectReview,
   insertReview,
   updateReviewStatus,
+  checkUserExist,
 };

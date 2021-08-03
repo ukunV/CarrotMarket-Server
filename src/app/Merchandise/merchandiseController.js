@@ -24,6 +24,11 @@ exports.getAllMerchandise = async function (req, res) {
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
 
+  const checkUserExist = merchandiseProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
+
   const checkLocationExist = await merchandiseProvider.checkLocationExist(
     locationId
   );
@@ -53,6 +58,11 @@ exports.getMerchandise = async function (req, res) {
 
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkUserExist = merchandiseProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
 
   const checkMerchandiseExist = await merchandiseProvider.checkMerchandiseExist(
     merchandiseId
@@ -93,6 +103,11 @@ exports.getCategory = async function (req, res) {
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
 
+  const checkUserExist = merchandiseProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
+
   const result = await merchandiseProvider.getCategory();
 
   return res.send(response(baseResponse.SUCCESS, result));
@@ -116,6 +131,11 @@ exports.getCategoryMerchandise = async function (req, res) {
 
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkUserExist = merchandiseProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
 
   const checkLocationExist = await merchandiseProvider.checkLocationExist(
     locationId
@@ -156,6 +176,11 @@ exports.createMerchandise = async function (req, res) {
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
 
+  const checkUserExist = merchandiseProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
+
   const checkCategoryExist = await merchandiseProvider.checkCategoryExist(
     categoryId
   );
@@ -192,6 +217,11 @@ exports.deleteMerchandise = async function (req, res) {
 
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkUserExist = merchandiseProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
 
   const checkMerchandiseExist = await merchandiseProvider.checkMerchandiseExist(
     merchandiseId
@@ -235,6 +265,11 @@ exports.pullUpMerchandise = async function (req, res) {
 
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkUserExist = merchandiseProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
 
   const checkMerchandiseExist = await merchandiseProvider.checkMerchandiseExist(
     merchandiseId
@@ -299,6 +334,11 @@ exports.updateMerchandiseStatus = async function (req, res) {
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
 
+  const checkUserExist = merchandiseProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
+
   const checkMerchandiseExist = await merchandiseProvider.checkMerchandiseExist(
     merchandiseId
   );
@@ -352,6 +392,11 @@ exports.getMyMerchandise = async function (req, res) {
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
 
+  const checkUserExist = merchandiseProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
+
   let condition = "";
 
   switch (status) {
@@ -386,6 +431,11 @@ exports.updateMerchandise = async function (req, res) {
 
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkUserExist = merchandiseProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
 
   const checkHost = await merchandiseProvider.checkHost(userId, merchandiseId);
 
@@ -428,6 +478,11 @@ exports.updateMerchandiseHideOn = async function (req, res) {
 
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkUserExist = merchandiseProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
 
   const checkMerchandiseExist = await merchandiseProvider.checkMerchandiseExist(
     merchandiseId
@@ -479,6 +534,11 @@ exports.updateMerchandiseHideOff = async function (req, res) {
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
 
+  const checkUserExist = merchandiseProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
+
   const checkMerchandiseExist = await merchandiseProvider.checkMerchandiseExist(
     merchandiseId
   );
@@ -525,6 +585,11 @@ exports.getMyHideMerchandise = async function (req, res) {
 
   if (userId !== bodyId)
     return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2006
+
+  const checkUserExist = merchandiseProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2026
 
   const result = await merchandiseProvider.getMyHideMerchandise(userId);
 
