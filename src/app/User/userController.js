@@ -54,11 +54,11 @@ exports.createUser = async function (req, res) {
   });
 
   const to = userPhoneNum;
-  const contents = `[당근마켓] 인증번호 [${sendAuth}]`;
+  const content = `[당근마켓] 인증번호 [${sendAuth}]`;
 
   const { success, status, msg } = await ncp.sendSMS({
     to,
-    contents,
+    content,
   });
 
   if (!success) {
