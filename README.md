@@ -1,7 +1,5 @@
 ## Structure
 
-<hr>
-
 ```
 ├── 📂 config
 │   ├── 📄 baseResponseStatus.js
@@ -61,20 +59,12 @@
 └── 📄 README.md
 ```
 
-<br>
-
 ## ERD (AqueryTool)
-
-<hr>
 
 [CarrotMarket - ERD](https://aquerytool.com/aquerymain/index/?rurl=2dfdcc71-f60a-4306-ac9d-8b303411339a)
 
 > password: 57nb74
 
-<br>
-
 ## API Specification
-
-<hr>
 
 [CarrotMarket - API Specification](https://docs.google.com/spreadsheets/d/1rSCdo6pP4Xo8qxCNOJFs7G3DFJ0R3hfqZhpsfFGTzbw/edit?usp=sharing)
