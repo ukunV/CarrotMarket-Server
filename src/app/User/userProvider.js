@@ -112,3 +112,35 @@ exports.getMyCarrot = async function (userId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// // 이메일 존재 여부 check(kakao)
+// exports.checkEmailExist = async function (email) {
+//   try {
+//     const connection = await pool.getConnection(async (conn) => conn);
+
+//     const result = await userDao.checkEmailExist(connection, email);
+
+//     connection.release();
+
+//     return result;
+//   } catch (err) {
+//     logger.error(`checkEmailExist Provider error\n: ${err.message}`);
+//     return errResponse(baseResponse.DB_ERROR);
+//   }
+// };
+
+// // 유저 ID 조회(kakao)
+// exports.getUserIdByEmail = async function (email) {
+//   try {
+//     const connection = await pool.getConnection(async (conn) => conn);
+
+//     const result = await userDao.selectUserIdByEmail(connection, email);
+
+//     connection.release();
+
+//     return result;
+//   } catch (err) {
+//     logger.error(`getUserIdByEmail Provider error\n: ${err.message}`);
+//     return errResponse(baseResponse.DB_ERROR);
+//   }
+// };

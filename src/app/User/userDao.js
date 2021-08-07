@@ -170,6 +170,30 @@ async function checkStatus(connection, selectedId) {
   return row[0][0]["status"];
 }
 
+// // 이메일 존재 여부 check(kakao)
+// async function checkEmailExist(connection, email) {
+//   const query = `
+//         select exists(select userPhoneNum from User where userPhoneNum = ?) as exist;
+//                 `;
+
+//   const row = await connection.query(query, email);
+
+//   return row[0][0]["exist"];
+// }
+
+// // 유저 ID 조회 by email(kakao)
+// async function selectUserIdByEmail(connection, email) {
+//   const query = `
+//                 select id
+//                 from User
+//                 where userPhoneNum = ?;
+//                 `;
+
+//   const row = await connection.query(query, email);
+
+//   return row[0];
+// }
+
 module.exports = {
   selectUserPhoneNum,
   selectUserNickname,
@@ -180,4 +204,6 @@ module.exports = {
   selectUserProfile,
   checkUserExist,
   checkStatus,
+  // checkEmailExist,
+  // selectUserIdByEmail,
 };

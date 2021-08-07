@@ -24,6 +24,8 @@
     "node-sens": "^1.3.0",
     "nodemailer": "^6.6.3",
     "nodemon": "^2.0.7",
+    "passport": "^0.4.1",
+    "passport-kakao": "^1.0.1",
     "regex-email": "^1.0.2",
     "winston": "^3.2.1",
     "winston-daily-rotate-file": "^4.2.1"
