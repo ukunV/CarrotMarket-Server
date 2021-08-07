@@ -13,6 +13,8 @@ const { emit } = require("nodemon");
 const { NCPClient } = require("../../../config/ncp_client");
 const sensKey = require("../../../config/ncp_config").sensSecret;
 
+const mailer = require("../../../config/mail_client");
+
 // Regex
 const regPhoneNum = /^\d{3}\d{3,4}\d{4}$/;
 const regNum = /^[0-9]/g;
@@ -155,6 +157,9 @@ exports.createUser = async function (req, res) {
 exports.getMyCarrot = async function (req, res) {
   const { userId } = req.verifiedToken;
   const { bodyId } = req.body;
+
+  // mailer test
+  // await mailer.resetPasswordMail("1231");
 
   // Request Error
   if (!userId) return res.send(errResponse(baseResponse.ID_NOT_MATCHING)); // 2005
