@@ -15,9 +15,10 @@ const sensKey = require("../../../config/ncp_config").sensSecret;
 
 const mailer = require("../../../config/mail_client");
 
-// const passport = require("passport");
-// const KakaoStrategy = require("passport-kakao").Strategy;
-// const axios = require("axios");
+const kakaoConf = require("../../../config/kakao_config");
+const passport = require("passport");
+const KakaoStrategy = require("passport-kakao").Strategy;
+const axios = require("axios");
 
 // Regex
 const regPhoneNum = /^\d{3}\d{3,4}\d{4}$/;
@@ -45,95 +46,99 @@ function createAuthNum() {
   return randNum;
 }
 
-// /**
-//  * API No. 0
-//  * API Name : 카카오 로그인 API
-//  * [] /auth/kakao/callback
-//  */
+/**
+ * API No.
+ * API Name : 카카오 로그인 API
+ * [] /auth/kakao/callback
+ */
 
-// passport.use(
-//   "kakao-login",
-//   new KakaoStrategy(
-//     {
-//       clientID: "",
-//       callbackURL: "/auth/kakao/callback",
-//     },
-//     async (accessToken, refreshToken, profile, done) => {
-//       console.log(accessToken);
-//       console.log(refreshToken);
-//       console.log(profile);
-//     }
-//   )
-// );
+passport.use(
+  "kakao-login",
+  new KakaoStrategy(
+    {
+      clientID: kakaoConf.clientID,
+      callbackURL: "/auth/kakao/callback",
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      console.log(accessToken);
+      console.log("-------------------------------------------------------");
+      console.log(refreshToken);
+      console.log("-------------------------------------------------------");
+      console.log(profile);
+      console.log("-------------------------------------------------------");
+      console.log(done);
+    }
+  )
+);
 
-// exports.kakaoLogin = async function (req, res) {
-//   const { accessToken } = req.body;
+exports.kakaoLogin = async function (req, res) {
+  const { accessToken } = req.body;
 
-//   if (!accessToken) {
-//     console.log(err);
-//     return 0;
-//   }
+  if (!accessToken) {
+    console.log(err);
+    return 0;
+  }
 
-//   try {
-//     let kakaoProfile;
+  try {
+    let kakaoProfile;
 
-//     try {
-//       kakaoProfile = await axios.get("https://kapi.kakao.com/v2/user/me", {
-//         headers: {
-//           Authorization: "Bearer " + accessToken,
-//           "Content-Type": "application/json",
-//         },
-//       });
-//     } catch (err) {
-//       console.log(err);
-//       return 0;
-//     }
+    try {
+      kakaoProfile = await axios.get("https://kapi.kakao.com/v2/user/me", {
+        headers: {
+          Authorization: "Bearer " + accessToken,
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (err) {
+      console.log(err);
+      return 0;
+    }
 
-//     const kakaoData = kakaoProfile.data.kakao_account;
+    const kakaoData = kakaoProfile.data.kakao_account;
 
-//     const email = kakaoData.email;
-//     const nickname = kakaoData.profile.nickname;
+    const email = kakaoData.email;
+    const name = kakaoData.profile.nickname;
 
-//     const checkEmailExist = await userProvider.checkEmailExist(email);
+    const checkEmailExist = await userProvider.checkEmailExist(email);
 
-//     if (checkEmailExist === 1) {
-//       const userIdx = await userProvider.getUserIdByEmail(email);
+    if (checkEmailExist === 1) {
+      const userIdx = await userProvider.getUserIdByEmail(email);
 
-//       //토큰 생성 Service
-//       const token = await jwt.sign(
-//         {
-//           userId: userIdx[0].id,
-//         }, // 토큰의 내용(payload)
-//         secret_config.jwtsecret, // 비밀키
-//         {
-//           expiresIn: "365d",
-//           subject: "userInfo",
-//         } // 유효 기간 365일
-//       );
+      //토큰 생성 Service
+      const token = await jwt.sign(
+        {
+          userId: userIdx[0].id,
+        }, // 토큰의 내용(payload)
+        secret_config.jwtsecret, // 비밀키
+        {
+          expiresIn: "365d",
+          subject: "userInfo",
+        } // 유효 기간 365일
+      );
 
-//       return res.send(
-//         response(baseResponse.SUCCESS, {
-//           userId: userIdx[0].id,
-//           jwt: token,
-//           message: "소셜로그인에 성공하셨습니다.",
-//         })
-//       );
-//     } else {
-//       const result = {
-//         name: name,
-//         email: email,
-//       };
-//       return res.send(
-//         response(baseResponse.SUCCESS, {
-//           message: "회원가입이 가능합니다.",
-//           result,
-//         })
-//       );
-//     }
-//   } catch (err) {
-//     return errResponse(baseResponse.DB_ERROR);
-//   }
-// };
+      return res.send(
+        response(baseResponse.SUCCESS, {
+          userId: userIdx[0].id,
+          jwt: token,
+          message: "소셜로그인에 성공하셨습니다.",
+        })
+      );
+    } else {
+      const result = {
+        name,
+        email,
+      };
+      return res.send(
+        response(baseResponse.SUCCESS, {
+          message: "회원가입이 가능합니다.",
+          result,
+        })
+      );
+    }
+  } catch (err) {
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
 
 /**
  * API No. 1
