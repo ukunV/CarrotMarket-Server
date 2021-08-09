@@ -1,3 +1,7 @@
+## Architecture
+
+![sdaf](https://user-images.githubusercontent.com/23329560/128726338-7fdd528f-553d-464e-8024-61a28c893587.JPG)
+
 ## Structure
 
 ```
@@ -6,6 +10,9 @@
 │   ├── 📄 database.js
 │   ├── 📄 express.js
 │   ├── 📄 jwtMiddleware.js
+│   ├── 📄 kakao_config.js
+│   ├── 📄 mail_client.js
+│   ├── 📄 mail_config.js
 │   ├── 📄 ncp_client.js
 │   ├── 📄 ncp_config.js
 │   ├── 📄 response.js
