@@ -17,6 +17,9 @@ module.exports = function (app) {
     }
   );
 
+  // sens-test API
+  app.post("/sens/test", user.sensTest);
+
   // 1. 로그인 API (비회원일 경우 회원가입 후 로그인)
   app.post("/user/login", user.createUser);
 

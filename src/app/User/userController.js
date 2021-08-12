@@ -47,6 +47,39 @@ function createAuthNum() {
 }
 
 /**
+ * API Name : ncp-sens test
+ * [POST] /sens/test
+ */
+
+exports.sensTest = async function (req, res) {
+  const sendAuth = createAuthNum();
+
+  const ncp = new NCPClient({
+    ...sensKey,
+  });
+
+  const to = "";
+  const content = `[당근마켓] 인증번호 [${sendAuth}]`;
+
+  const { success, status, msg } = await ncp.sendSMS({
+    to,
+    content,
+  });
+
+  if (!success) {
+    console.log(
+      `(ERROR) node-sens error: ${msg}, Status ${status} Date ${Date.now()}`
+    );
+    res.send("SMS 전송 중 오류가 발생했습니다.");
+  } else {
+    console.log(success);
+    console.log(status);
+    console.log(msg);
+    return res.send(response(baseResponse.SUCCESS));
+  }
+};
+
+/**
  * API No.
  * API Name : 카카오 로그인 API
  * [] /auth/kakao/callback
