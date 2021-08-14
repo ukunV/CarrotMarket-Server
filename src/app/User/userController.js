@@ -20,6 +20,8 @@ const passport = require("passport");
 const KakaoStrategy = require("passport-kakao").Strategy;
 const axios = require("axios");
 
+const kakaoMap = require("../../../config/kakao_map_client").getAddressInfo;
+
 // Regex
 const regPhoneNum = /^\d{3}\d{3,4}\d{4}$/;
 const regNum = /^[0-9]/g;
@@ -289,6 +291,9 @@ exports.createUser = async function (req, res) {
 exports.getMyCarrot = async function (req, res) {
   const { userId } = req.verifiedToken;
   const { bodyId } = req.body;
+
+  // kakao_map test
+  // kakaoMap("강원도 강릉시 남부로17번길 38 강릉시보건소");
 
   // mailer test
   // await mailer.resetPasswordMail("1231");
