@@ -3,4 +3,9 @@ config/database.js
 config/secret.js
 config/ncp_client.js
 config/ncp_config.js
+config/mail_config.js
+config/mail_client.js
+config/kakao_config.js
+config/kakao_map_client.js
 log/*
+src/app/admin

@@ -293,7 +293,11 @@ exports.getMyCarrot = async function (req, res) {
   const { bodyId } = req.body;
 
   // kakao_map test
-  // kakaoMap("강원도 강릉시 남부로17번길 38 강릉시보건소");
+  const { lat, lng } = await kakaoMap("충북 단양군 단양읍 별곡리");
+
+  console.log("---------------------");
+  console.log(lat, lng);
+  console.log("---------------------");
 
   // mailer test
   // await mailer.resetPasswordMail("1231");
